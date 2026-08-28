@@ -68,6 +68,27 @@
   .note { font-size:.82rem; color:#9fb0c8; }
   .note li { margin-bottom:6px; margin-left:1.2em; }
   .note h3 { color:#ffd97f; font-size:.9rem; margin:10px 0 4px; }
+  #blindBtn {
+    width:100%; padding:16px; font-size:1.15rem; font-weight:bold;
+    border:2px dashed #ffd97f; border-radius:12px; background:#2a2410;
+    color:#ffd97f; cursor:pointer; margin-bottom:12px;
+  }
+  #overlay {
+    display:none; position:fixed; inset:0; background:#000; z-index:99;
+    touch-action:none; -webkit-user-select:none; user-select:none;
+  }
+  #overlay .big {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:18px; text-align:center;
+    color:#7fd0ff; padding:24px;
+  }
+  #overlay .segno { font-size:4rem; font-weight:bold; }
+  #overlay .hint { font-size:1rem; color:#9fb0c8; line-height:1.8; }
+  #overlay .exit {
+    position:absolute; top:10px; right:10px; z-index:100;
+    background:#333; color:#bbb; border:1px solid #555; border-radius:8px;
+    padding:8px 14px; font-size:.9rem;
+  }
 </style>
 </head>
 <body>
@@ -86,6 +107,18 @@
   <span>語速</span>
   <input type="range" id="rate" min="0.7" max="1.2" step="0.05" value="0.95">
   <span id="rateVal">0.95</span>
+</div>
+
+<button id="blindBtn" onclick="enterBlind()">🙈 受測模式（戴眼罩的人自己拿手機）<br>
+<small>進入後：點螢幕任何地方＝播下一段｜兩指點一下＝重播這段</small></button>
+
+<div id="overlay">
+  <button class="exit" onclick="exitBlind(event)">✕ 離開</button>
+  <div class="big">
+    <div class="segno" id="ovSeg">–</div>
+    <div id="ovState">點一下螢幕，播放第 1 段</div>
+    <div class="hint">一指點＝下一段<br>兩指點＝重播這段<br>（此畫面全黑防窺，操作員由此看進度）</div>
+  </div>
 </div>
 
 <div id="segs"></div>
@@ -308,7 +341,12 @@ function playSeg(i){
       u.lang = 'zh-TW';
       if (zhVoice) u.voice = zhVoice;
       u.rate = rate;
-      if (k === parts.length - 1) u.onend = function(){ playIdx = -1; render(); };
+      if (k === parts.length - 1) u.onend = function(){
+        playIdx = -1; render();
+        if (document.getElementById('overlay').style.display === 'block'){
+          ovShow(String(i + 1), '第 ' + (i + 1) + ' 段播完了。照著做，做完點一下播下一段');
+        }
+      };
       speechSynthesis.speak(u);
     });
   }, 150);
@@ -344,6 +382,75 @@ function render(){
     host.appendChild(d);
   });
 }
+
+/* ====== 受測模式（戴眼罩用：點一下=下一段，兩指=重播） ====== */
+var blindNext = 0;   // 下一個要播的段落索引
+
+function speakLine(text){
+  try { speechSynthesis.cancel(); } catch(e) {}
+  setTimeout(function(){
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-TW';
+    if (zhVoice) u.voice = zhVoice;
+    u.rate = parseFloat(document.getElementById('rate').value);
+    speechSynthesis.speak(u);
+  }, 150);
+}
+
+function ovShow(no, state){
+  document.getElementById('ovSeg').textContent = no;
+  document.getElementById('ovState').textContent = state;
+}
+
+function enterBlind(){
+  blindNext = 0;
+  document.getElementById('overlay').style.display = 'block';
+  ovShow('–', '點一下螢幕，播放第 1 段');
+  // 這次按鈕點擊就是 iOS 解鎖語音的手勢
+  speakLine('受測模式開始。點一下螢幕播放第一段，兩指點一下重播。');
+}
+
+function exitBlind(e){
+  if (e) e.stopPropagation();
+  stopSpeak();
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function blindPlay(idx, advance){
+  if (idx >= SEGS.length){
+    ovShow('✓', '四段都播完了，再點一下會從第 1 段重新開始');
+    speakLine('四段都播放完了。再點一下，會從第一段重新開始。');
+    blindNext = 0;
+    return;
+  }
+  if (!SEGS[idx][VER]){
+    speakLine('A 版還沒有輸入螢幕尺寸，請操作員先到設定填入螢幕寬和高。');
+    return;
+  }
+  ovShow(String(idx + 1), (advance ? '播放中：第 ' : '重播中：第 ') + (idx + 1) + ' 段（' + VER + ' 版）');
+  playSeg(idx);
+  if (advance) blindNext = idx + 1;
+}
+
+(function(){
+  var ov = document.getElementById('overlay');
+  var lastTouch = 0;
+  ov.addEventListener('touchstart', function(e){
+    if (e.target.classList.contains('exit')) return;
+    e.preventDefault();
+    lastTouch = Date.now();
+    if (e.touches.length >= 2){
+      blindPlay(Math.max(blindNext - 1, 0), false);   // 兩指：重播目前段
+    } else {
+      blindPlay(blindNext, true);                     // 一指：播下一段
+    }
+  }, {passive:false});
+  ov.addEventListener('click', function(e){
+    if (e.target.classList.contains('exit')) return;
+    if (Date.now() - lastTouch < 700) return;         // 手機已由 touchstart 處理
+    blindPlay(blindNext, true);                       // 桌機備援：點擊＝下一段
+  });
+})();
 
 /* ====== 實測值輸入 ====== */
 function bindInput(id, key){
