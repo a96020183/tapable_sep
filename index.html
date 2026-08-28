@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>任務A 語音引導原型（R1/R2 眼罩測試用）</title>
+<!--
+  瑤光深鯨 TapAble — 任務A 模擬 demo
+  用途：機台測試第二趟（R1=A版 / R2=B版）戴眼罩測試者聽的語音引導。
+  規格：田野包/機台測試操作手冊.pdf 第 4 節。
+  資料來源：2026/8/28 劉芯妤 R0 實測（校園文件列印暨自動化繳費機）
+    - 流程照片 24 張（LINE_ALBUM_流程圖_260828_1~24.jpg）
+    - 完整操作影片 809431878.632502.mp4（1分18秒）
+    - 實際申請項目：中文成績名次證明書 1 份 20 元，現金投幣
+  畫面按鈕位置 = 從 R0 照片量出的「螢幕比例座標」（真實資料）。
+  A 版的公分數 = 比例 × 螢幕實際寬高（需在頁面「實測值」欄輸入 R0 量到的螢幕尺寸）。
+  ※ 離線單一檔案，直接用手機瀏覽器開啟即可，不需網路。
+  ※ iOS 請先按任一播放鈕（需使用者手勢解鎖語音）。
+-->
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    background:#0f1626; color:#f2f5fa; padding:16px; max-width:720px; margin:0 auto;
+    line-height:1.7;
+  }
+  h1 { font-size:1.25rem; margin-bottom:2px; color:#7fd0ff; }
+  .sub { font-size:.85rem; color:#9fb0c8; margin-bottom:14px; }
+  .tabs { display:flex; gap:10px; margin-bottom:10px; }
+  .tab {
+    flex:1; padding:14px 8px; font-size:1.1rem; font-weight:bold;
+    border:2px solid #3a4a66; border-radius:12px; background:#1a2438; color:#c9d6e8;
+    cursor:pointer; text-align:center;
+  }
+  .tab.on { background:#0e5aa7; border-color:#7fd0ff; color:#fff; }
+  .tab small { display:block; font-size:.75rem; font-weight:normal; opacity:.8; }
+  #banner {
+    display:none; background:#5a1f1f; border:1px solid #c96a6a; color:#ffd9d9;
+    padding:10px 12px; border-radius:10px; font-size:.9rem; margin-bottom:10px;
+  }
+  .seg {
+    background:#1a2438; border:1px solid #2c3a54; border-radius:14px;
+    padding:14px; margin-bottom:12px;
+  }
+  .seg.playing { border-color:#7fd0ff; box-shadow:0 0 0 2px #7fd0ff55; }
+  .seg h2 { font-size:1.05rem; color:#ffd97f; margin-bottom:8px; }
+  .btnrow { display:flex; gap:10px; margin-bottom:10px; }
+  .play, .stopb {
+    flex:1; padding:16px; font-size:1.2rem; font-weight:bold; border:none;
+    border-radius:12px; cursor:pointer;
+  }
+  .play { background:#1f8f4d; color:#fff; }
+  .play:disabled { background:#3a4a66; color:#8a97ab; }
+  .stopb { background:#8f2f2f; color:#fff; flex:0 0 30%; }
+  .txt { font-size:.92rem; color:#cdd8e8; white-space:pre-line;
+         border-top:1px dashed #2c3a54; padding-top:8px; }
+  .blank { color:#ff9f9f; font-weight:bold; }
+  details { background:#141c2e; border:1px solid #2c3a54; border-radius:12px;
+            padding:10px 14px; margin-bottom:12px; }
+  summary { cursor:pointer; font-weight:bold; color:#7fd0ff; }
+  label { display:block; font-size:.9rem; margin-top:10px; color:#c9d6e8; }
+  input[type=number] {
+    width:100%; padding:10px; font-size:1.1rem; border-radius:8px;
+    border:1px solid #3a4a66; background:#0f1626; color:#fff; margin-top:4px;
+  }
+  .rate { display:flex; align-items:center; gap:10px; margin:6px 0 14px; font-size:.9rem; }
+  .rate input { flex:1; }
+  .note { font-size:.82rem; color:#9fb0c8; }
+  .note li { margin-bottom:6px; margin-left:1.2em; }
+  .note h3 { color:#ffd97f; font-size:.9rem; margin:10px 0 4px; }
+</style>
+</head>
+<body>
+
+<h1>任務A　語音引導原型</h1>
+<div class="sub">校園成績列印機｜R1 播 A 版、R2 播 B 版｜一段一段播，聽完照著做</div>
+
+<div class="tabs">
+  <button class="tab" id="tabA" onclick="setVer('A')">A 版<small>絕對距離（公分）</small></button>
+  <button class="tab on" id="tabB" onclick="setVer('B')">B 版<small>相對觸覺（手掌／指寬）</small></button>
+</div>
+
+<div id="banner">⚠ A 版需要 R0 實測的「螢幕寬、高」才能報出公分數。<br>請展開下方「實測值輸入」填入，填完 A 版才能播放。</div>
+
+<div class="rate">
+  <span>語速</span>
+  <input type="range" id="rate" min="0.7" max="1.2" step="0.05" value="0.95">
+  <span id="rateVal">0.95</span>
+</div>
+
+<div id="segs"></div>
+
+<details id="cfg">
+  <summary>實測值輸入（R0 記錄表的數字，填了會自動存在這支手機）</summary>
+  <label>螢幕寬（公分）※ A 版必填
+    <input type="number" id="mW" step="0.5" min="10" placeholder="例：30.5">
+  </label>
+  <label>螢幕高（公分）※ A 版必填
+    <input type="number" id="mH" step="0.5" min="10" placeholder="例：23">
+  </label>
+  <label>螢幕下緣離地高度（公分）※ 選填，填了 A 版會多報出口高度
+    <input type="number" id="mFloor" step="0.5" min="30" placeholder="例：120">
+  </label>
+</details>
+
+<details>
+  <summary>給團隊的備註（不會唸出來）</summary>
+  <div class="note">
+    <h3>R1 出發前要先在現場確認（照片看不出來的）</h3>
+    <ul>
+      <li>輸入畫面的「學號欄 → 生日欄」焦點怎麼切換：自動跳？還是要先點欄位？確認後若要點欄位，把第二段語音補一句。</li>
+      <li>投幣口的細縫方向（直的還是橫的），第四段目前只講「突出的投幣座」。</li>
+      <li>硬幣一次投一枚，投幣座旁貼紙寫「勿投入 1 元（會當機）」——語音已包含。</li>
+    </ul>
+    <h3>資料來源</h3>
+    <ul>
+      <li>畫面流程與按鈕位置：R0 照片 24 張＋操作影片（8/28 劉芯妤）。</li>
+      <li>申請項目照影片實際走：中文成績名次證明書、1 份、20 元、現金。</li>
+      <li>A 版公分數＝照片量出的比例 × 你輸入的螢幕實測寬高，非憑空估計。</li>
+    </ul>
+    <h3>備援</h3>
+    <ul>
+      <li>怕現場網頁出狀況：在安靜處先把 8 段各播一次、用另一支手機錄音存檔。</li>
+    </ul>
+  </div>
+</details>
+
+<script>
+/* ====== 實測值（localStorage 保存） ====== */
+function loadM(){
+  var m = { W:null, H:null, floor:null };
+  try {
+    var s = localStorage.getItem('taskA_measures');
+    if (s) m = Object.assign(m, JSON.parse(s));
+  } catch(e) {}
+  return m;
+}
+function saveM(){
+  try { localStorage.setItem('taskA_measures', JSON.stringify(M)); } catch(e) {}
+}
+var M = loadM();
+
+/* ====== 畫面比例座標（從 R0 照片量得；fx=距左緣比例, fy=距上緣比例） ====== */
+/* 來源照片：語言選擇=圖1、身分=圖2、鍵盤=圖3/4、清單=圖6/7、學年期=圖11/12、
+   確認=圖12、現金=圖13、繼續結束=圖24 */
+var T = {
+  langBtn:   { fx:0.80, fy:0.32 },   // 中文版（英文版在其正下方）
+  enterBtn:  { fx:0.82, fy:0.87 },   // 鍵盤畫面右下「確定」
+  kbLeft:0.13, kbRight:0.61, kbTop:0.42, kbBottom:0.75,  // 字母鍵盤範圍
+  row2:      { fy:0.27 },            // 清單第二列（中文成績名次證明書）
+  dropdown:  { fx:0.48, fy:0.40 },   // 學年期下拉選單框
+  confirmOk: { fx:0.78, fy:0.42 },   // 確認畫面「確定」
+  cashBtn:   { fx:0.50, fy:0.63 },   // 「現金」
+  endBtn:    { fx:0.63, fy:0.64 }    // 「結束」
+};
+
+/* 公分換算：有實測值回整數字串，沒有回 null */
+function cmW(f){ return M.W ? String(Math.round(f * M.W)) : null; }
+function cmH(f){ return M.H ? String(Math.round(f * M.H)) : null; }
+function hasWH(){ return !!(M.W && M.H); }
+
+/* ====== 語音腳本（A/B 內容一致，只有描述方式不同） ====== */
+function buildSegs(){
+  var W = M.W, H = M.H;
+  return [
+  {
+    title:'第 1 段　認識機台、選語言和身分',
+    B:'這裡是成績列印機語音引導，第一段。'
+     +'機台正面有一塊直立的觸控螢幕，在機台的上半部。'
+     +'先伸出手，摸到螢幕的四個角，確認螢幕的範圍。'
+     +'感應貼紙貼在螢幕的右下角。'
+     +'每一個畫面都有十分鐘的操作時間，不用急。'
+     +'現在開始，第一個畫面要選語言。'
+     +'右手摸到螢幕右上角，指尖沿著右邊邊框往下，大約一個手掌的長度，'
+     +'再往螢幕中間移進兩指寬，這裡是中文版按鈕，按一下。'
+     +'畫面換了之後，手不用移動，同樣的位置就是學生校友按鈕，再按一下。'
+     +'如果沒有反應，手指往下移半指寬，再按一次。'
+     +'第一段結束。',
+    A: hasWH() ?
+      '這裡是成績列印機語音引導，第一段。'
+     +'機台正面有一塊直立的觸控螢幕，寬約'+W+'公分，高約'+H+'公分，在機台的上半部'
+     +(M.floor ? '，螢幕下緣離地約'+Math.round(M.floor)+'公分' : '')+'。'
+     +'先摸到螢幕的四個角，確認範圍。感應貼紙貼在螢幕的右下角。'
+     +'每一個畫面都有十分鐘的操作時間，不用急。'
+     +'現在開始，第一個畫面要選語言。'
+     +'中文版按鈕的中心，離螢幕右緣約'+cmW(1-T.langBtn.fx)+'公分，'
+     +'離上緣約'+cmH(T.langBtn.fy)+'公分，按一下。'
+     +'畫面換了之後，同樣的位置就是學生校友按鈕，再按一下。'
+     +'如果沒有反應，手指往下移一公分，再按一次。'
+     +'第一段結束。' : null
+  },
+  {
+    title:'第 2 段　輸入學號和生日',
+    B:'第二段，輸入資料。'
+     +'畫面上方有兩個輸入欄，左邊輸入學號，右邊輸入生日。'
+     +'生日要輸入西元年月日，一共八個數字。'
+     +'字母鍵盤在螢幕的左半邊，一共四排。'
+     +'第一排從A到G，第二排從H到N，第三排從O到U，第四排從V到Z，每個鍵大約兩指寬。'
+     +'數字鍵盤在螢幕的右半邊，三排，由上到下是一二三、四五六、七八九。'
+     +'最下面一排，左邊是倒退，中間是零，右邊是清除。打錯字，按倒退可以刪掉一個字。'
+     +'先輸入學號，再輸入生日。'
+     +'都輸入完成後，摸到螢幕右下角，往上和往左各兩指寬，是確定按鈕，按下去。'
+     +'畫面會顯示認證處理中，把手放開，等畫面切換。'
+     +'第二段結束。',
+    A: hasWH() ?
+      '第二段，輸入資料。'
+     +'畫面上方有兩個輸入欄，左邊輸入學號，右邊輸入生日。'
+     +'生日要輸入西元年月日，一共八個數字。'
+     +'字母鍵盤在螢幕左半邊：離左緣約'+cmW(T.kbLeft)+'公分到'+cmW(T.kbRight)+'公分之間，'
+     +'離上緣約'+cmH(T.kbTop)+'公分到'+cmH(T.kbBottom)+'公分之間，一共四排。'
+     +'第一排從A到G，第二排從H到N，第三排從O到U，第四排從V到Z，'
+     +'每個鍵約'+cmW((T.kbRight-T.kbLeft)/7)+'公分寬。'
+     +'數字鍵盤在螢幕右半邊，三排，由上到下是一二三、四五六、七八九。'
+     +'最下面一排，左邊是倒退，中間是零，右邊是清除。打錯字，按倒退可以刪掉一個字。'
+     +'先輸入學號，再輸入生日。'
+     +'都輸入完成後按確定：確定按鈕的中心，離右緣約'+cmW(1-T.enterBtn.fx)+'公分，'
+     +'離下緣約'+cmH(1-T.enterBtn.fy)+'公分。'
+     +'畫面會顯示認證處理中，把手放開，等畫面切換。'
+     +'第二段結束。' : null
+  },
+  {
+    title:'第 3 段　選申請項目和學期',
+    B:'第三段，選擇申請項目。'
+     +'現在畫面是申請項目清單，一共十一列，由上往下排。'
+     +'今天要申請第二列，中文成績名次證明書，一份二十元。'
+     +'摸到螢幕左上角，指尖沿著左邊邊框往下，大約一個手掌的長度，'
+     +'這個高度就是第二列，往螢幕中間按下去，整列都可以按。'
+     +'選好之後，按螢幕右下角的確定，位置和上一段的確定相同。'
+     +'接著要選學年期。畫面中間偏上，有一個長方形的選單框，按一下把它展開。'
+     +'展開之後，選單框的正下方第一列，就是最近的一個學期，按下去。'
+     +'再按畫面右下方的確定。'
+     +'最後是確認畫面，確定按鈕移到了畫面右側，大約在中間的高度，按下去，就完成申請。'
+     +'第三段結束。',
+    A: hasWH() ?
+      '第三段，選擇申請項目。'
+     +'現在畫面是申請項目清單，一共十一列，由上往下排。'
+     +'今天要申請第二列，中文成績名次證明書，一份二十元。'
+     +'第二列的高度，離螢幕上緣約'+cmH(T.row2.fy)+'公分，左右任何位置都可以按。'
+     +'選好之後，按螢幕右下角的確定，位置和上一段的確定相同。'
+     +'接著要選學年期。選單框的中心，離螢幕左緣約'+cmW(T.dropdown.fx)+'公分，'
+     +'離上緣約'+cmH(T.dropdown.fy)+'公分，按一下把它展開。'
+     +'展開之後，選單框的正下方第一列，就是最近的一個學期，按下去。'
+     +'再按畫面右下方的確定。'
+     +'最後是確認畫面：確定按鈕的中心，離右緣約'+cmW(1-T.confirmOk.fx)+'公分，'
+     +'離上緣約'+cmH(T.confirmOk.fy)+'公分，按下去，就完成申請。'
+     +'第三段結束。' : null
+  },
+  {
+    title:'第 4 段　投幣繳費、取件',
+    B:'第四段，繳費和取件。'
+     +'畫面中央偏下有一顆現金按鈕，先按它。'
+     +'接著投幣。投幣口不在螢幕上，在螢幕右上方外側的機台面板上，是一個突出的投幣座。'
+     +'注意，不要投一元硬幣，機器會當機。'
+     +'這一次要投二十元，請投兩枚十元硬幣，一次投一枚。'
+     +'投完之後，機器會自動確認金額、扣款、開始列印，你會聽到機器運轉的聲音，把手放開等待。'
+     +'列印完成後，畫面會問要不要繼續申請。'
+     +'結束按鈕在畫面中央偏右的位置，按下去。'
+     +'最後取件。找零和收據，從收據出口退出，位置在螢幕正下方的機身中段。'
+     +'成績單從更下面的文件取出口出來，位置比較低，要彎腰拿。'
+     +'收據和成績單都拿好，操作全部完成。',
+    A: hasWH() ?
+      '第四段，繳費和取件。'
+     +'現金按鈕在螢幕正中間偏下：離左緣約'+cmW(T.cashBtn.fx)+'公分，'
+     +'離上緣約'+cmH(T.cashBtn.fy)+'公分，先按它。'
+     +'接著投幣。投幣口不在螢幕上，在螢幕右上方外側的機台面板上，是一個突出的投幣座。'
+     +'注意，不要投一元硬幣，機器會當機。'
+     +'這一次要投二十元，請投兩枚十元硬幣，一次投一枚。'
+     +'投完之後，機器會自動確認金額、扣款、開始列印，你會聽到機器運轉的聲音，把手放開等待。'
+     +'列印完成後，畫面會問要不要繼續申請。'
+     +'結束按鈕，離螢幕左緣約'+cmW(T.endBtn.fx)+'公分，離上緣約'+cmH(T.endBtn.fy)+'公分，按下去。'
+     +'最後取件。找零和收據，從收據出口退出，位置在螢幕正下方的機身中段。'
+     +'成績單從更下面的文件取出口出來，位置比較低，要彎腰拿。'
+     +'收據和成績單都拿好，操作全部完成。' : null
+  }];
+}
+
+/* ====== 語音播放（Web Speech API zh-TW） ====== */
+var VER = 'B', SEGS = [], zhVoice = null, playIdx = -1;
+
+function pickVoice(){
+  var vs = speechSynthesis.getVoices();
+  zhVoice = vs.find(function(v){ return /^zh[-_]TW/i.test(v.lang); })
+         || vs.find(function(v){ return /^zh/i.test(v.lang); }) || null;
+}
+if ('speechSynthesis' in window) {
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+
+function stopSpeak(){
+  try { speechSynthesis.cancel(); } catch(e) {}
+  playIdx = -1;
+  render();
+}
+
+function playSeg(i){
+  var text = SEGS[i][VER];
+  if (!text) return;
+  try { speechSynthesis.cancel(); } catch(e) {}
+  playIdx = i; render();
+  var rate = parseFloat(document.getElementById('rate').value);
+  // 句子切段（iOS 對長文字會中斷），cancel 後延遲再 speak（iOS 已知問題）
+  var parts = text.split('。').filter(function(s){ return s.trim(); })
+                  .map(function(s){ return s + '。'; });
+  setTimeout(function(){
+    parts.forEach(function(p, k){
+      var u = new SpeechSynthesisUtterance(p);
+      u.lang = 'zh-TW';
+      if (zhVoice) u.voice = zhVoice;
+      u.rate = rate;
+      if (k === parts.length - 1) u.onend = function(){ playIdx = -1; render(); };
+      speechSynthesis.speak(u);
+    });
+  }, 150);
+}
+
+/* ====== 畫面 ====== */
+function setVer(v){
+  VER = v;
+  stopSpeak();
+  document.getElementById('tabA').classList.toggle('on', v==='A');
+  document.getElementById('tabB').classList.toggle('on', v==='B');
+  render();
+}
+
+function render(){
+  SEGS = buildSegs();
+  var missing = (VER === 'A' && !hasWH());
+  document.getElementById('banner').style.display = missing ? 'block' : 'none';
+  var host = document.getElementById('segs');
+  host.innerHTML = '';
+  SEGS.forEach(function(s, i){
+    var d = document.createElement('div');
+    d.className = 'seg' + (playIdx === i ? ' playing' : '');
+    var body = s[VER] || '（A 版需先在下方輸入螢幕寬高實測值）';
+    d.innerHTML =
+      '<h2>' + s.title + '</h2>' +
+      '<div class="btnrow">' +
+        '<button class="play" ' + (s[VER] ? '' : 'disabled') +
+          ' onclick="playSeg(' + i + ')">▶ 播放</button>' +
+        '<button class="stopb" onclick="stopSpeak()">■ 停止</button>' +
+      '</div>' +
+      '<div class="txt">' + (s[VER] ? body : '<span class="blank">' + body + '</span>') + '</div>';
+    host.appendChild(d);
+  });
+}
+
+/* ====== 實測值輸入 ====== */
+function bindInput(id, key){
+  var el = document.getElementById(id);
+  if (M[key]) el.value = M[key];
+  el.addEventListener('input', function(){
+    var v = parseFloat(el.value);
+    M[key] = (v > 0) ? v : null;
+    saveM(); render();
+  });
+}
+bindInput('mW', 'W');
+bindInput('mH', 'H');
+bindInput('mFloor', 'floor');
+
+document.getElementById('rate').addEventListener('input', function(){
+  document.getElementById('rateVal').textContent = this.value;
+});
+
+render();
+</script>
+</body>
+</html>
