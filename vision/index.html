@@ -160,28 +160,57 @@ function speak(text,p0){
 }
 
 /* ---------- 事件引擎：新事件才出聲，沒變化保持靜默 ---------- */
-const COOL={vehicle:5000,person:4500,screen:9000,guide:3500,search:12000};
+const COOL={vehicle:5000,person:4500,obstacle:6000,screen:9000,guide:3500,search:12000};
+// 室內障礙物（花博爭艷館場景）：靜態家具，只在很近且正前方才提醒
+const OBSTACLE=new Set(['chair','couch','dining table','bench','potted plant','refrigerator','tv','suitcase','backpack']);
+const GROW=1.18; // 面積成長 18%+ 判定為「朝你逼近」——同向移動/靜止的東西面積不變，不會觸發
 function geom(d){const b=d.bbox;return[(b[2]*b[3])/(view.width*view.height),(b[0]+b[2]/2)/view.width]}
+// 每個 tick 只講「最該講的那一件」，用逼近偵測濾掉同向/靜止的雜訊（組員回饋：一直平淡播報聽不清）
 function evaluate(dets,now){
+  // 同類多實例（一堆人／一排椅子）只取「最近的那個」(面積最大) 當代表 ——
+  // 否則 track 會被最後一個實例覆寫，方向亂跳、每幀重播，等於把雜訊問題在多人場景重新引入
+  const rep=new Map();
   for(const d of dets){
     const cls=d.class; if(!(cls in ZH))continue;
+    const a=geom(d)[0], cur=rep.get(cls);
+    if(!cur||a>cur.a)rep.set(cls,{d:d,a:a});
+  }
+  let best=null; // {prio,text,cls}
+  for(const it of rep.values()){
+    const d=it.d,cls=d.class;
     const g=geom(d),a=g[0],cx=g[1];
     const dir=dirOf(cx),tier=tierOf(a);
     const t=tracks.get(cls)||{seen:0,area:a,dir:dir,tier:tier,spoken:0,hits:0};
-    const fresh=now-t.seen>Math.max(3000,tickMs*2.5); // 窗口隨實際推論節奏放大，慢裝置不會把連續目擊誤判成新物件
+    const fresh=now-t.seen>Math.max(3000,tickMs*2.5); // 窗口隨推論節奏放大，慢裝置不誤判新物件
     t.hits=fresh?1:t.hits+1;
     const solid=d.score>=P0_SCORE&&t.hits>=P0_HITS; // 夠有把握才准開口
-    if(VEHICLE.has(cls)&&solid&&tier<=1&&(t.spoken===0||dir!==t.dir||now-t.spoken>COOL.vehicle)){
-      cueWarn();speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
+    const approaching=!fresh&&a>=t.area*GROW; // 面積在成長＝真的朝你來（同向/靜止不會）
+    const enterNear=tier===0&&t.tier!==0; // 這一刻剛進入「很近」
+    const cool=now-t.spoken;
+    let prio=0,text='';
+    if(solid){
+      // 車輛：逼近或已很近才報（不再是「看到就報」）
+      if(VEHICLE.has(cls)&&tier<=1&&(approaching||tier===0)){
+        prio=90+(tier===0?8:0)+(approaching?3:0);
+        text='注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。';
+      }
+      // 行人：剛進入很近報方向，或明顯逼近報靠近
+      else if(cls==='person'&&(enterNear||(approaching&&tier<=1))){
+        prio=70+(tier===0?8:0);
+        text=tier===0?('注意，'+DIR[dir]+'有行人，很近。'):('注意，'+DIR[dir]+'有人靠近。');
+      }
+      // 室內障礙物：只在正前方＋很近＋（逼近或剛變近）才提醒，避免站著也一直念
+      else if(OBSTACLE.has(cls)&&tier===0&&dir===1&&(approaching||enterNear)){
+        prio=55;text='注意，前方有障礙物，'+ZH[cls]+'。';
+      }
     }
-    else if(cls==='person'&&solid&&tier===0&&t.tier!==0&&now-t.spoken>COOL.person){ // 進入很近那一刻優先報方向
-      cueWarn();speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
-    }
-    else if(cls==='person'&&solid&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
-      cueWarn();speak('注意，'+DIR[dir]+'有人靠近。',true);t.spoken=now;
-    }
+    // 過門檻才算候選：新目標／換方向／逼近升級／或已冷卻夠久
+    const cd=VEHICLE.has(cls)?COOL.vehicle:cls==='person'?COOL.person:COOL.obstacle;
+    const changed=t.spoken===0||dir!==t.dir||(approaching&&cool>1600)||cool>cd;
+    if(prio>0&&changed&&(!best||prio>best.prio))best={prio,text,cls};
     t.seen=now;t.area=a;t.dir=dir;t.tier=tier;tracks.set(cls,t);
   }
+  if(best){const tt=tracks.get(best.cls);tt.spoken=now;tracks.set(best.cls,tt);cueWarn();speak(best.text,true);}
   if(targetMode&&!arrived)guideTarget(dets,now);
 }
 window.__V.evaluate=function(dets){evaluate(dets,Date.now())}; // 測試掛鉤：注入合成偵測結果
