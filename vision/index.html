@@ -99,7 +99,7 @@ function cueOk(){tone(1319,160,.09);setTimeout(function(){tone(1760,220,.09)},17
 function keepAwake(){if(navigator.wakeLock&&navigator.wakeLock.request)navigator.wakeLock.request('screen').then(function(l){wlock=l}).catch(function(){})}
 const view=$('view'),ctx=view.getContext('2d',{willReadFrequently:true});
 const live=$('live');
-const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',airplane:'飛機',truck:'卡車',boat:'船','traffic light':'紅綠燈','fire hydrant':'消防栓','stop sign':'停車標誌','parking meter':'停車收費表',bench:'長椅',bird:'鳥',cat:'貓',dog:'狗',horse:'馬',sheep:'羊',cow:'牛',elephant:'大象',bear:'熊',zebra:'斑馬',giraffe:'長頸鹿',backpack:'背包',umbrella:'雨傘',handbag:'手提包',tie:'領帶',suitcase:'行李箱',frisbee:'飛盤',skis:'滑雪板',snowboard:'滑雪板','sports ball':'球',kite:'風箏','baseball bat':'球棒','baseball glove':'棒球手套',skateboard:'滑板',surfboard:'衝浪板','tennis racket':'球拍',bottle:'瓶子','wine glass':'玻璃杯',cup:'杯子',fork:'叉子',knife:'刀',spoon:'湯匙',bowl:'碗',banana:'香蕉',apple:'蘋果',sandwich:'三明治',orange:'柳橙',broccoli:'花椰菜',carrot:'紅蘿蔔','hot dog':'熱狗',pizza:'披薩',donut:'甜甜圈',cake:'蛋糕',chair:'椅子',couch:'沙發','potted plant':'盆栽',bed:'床','dining table':'桌子',toilet:'馬桶',tv:'螢幕',laptop:'筆電螢幕',mouse:'滑鼠',remote:'遙控器',keyboard:'鍵盤','cell phone':'手機',microwave:'微波爐',oven:'烤箱',toaster:'烤麵包機',sink:'洗手台',refrigerator:'冰箱',book:'書',clock:'時鐘',vase:'花瓶',scissors:'剪刀','teddy bear':'玩偶','hair drier':'吹風機',toothbrush:'牙刷'};
+const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',airplane:'飛機',truck:'卡車',boat:'船','traffic light':'紅綠燈','fire hydrant':'消防栓','stop sign':'停車標誌','parking meter':'停車收費表',bench:'長椅',bird:'鳥',cat:'貓',dog:'狗',horse:'馬',sheep:'羊',cow:'牛',elephant:'大象',bear:'熊',zebra:'斑馬',giraffe:'長頸鹿',backpack:'背包',umbrella:'雨傘',handbag:'手提包',tie:'領帶',suitcase:'行李箱',frisbee:'飛盤',skis:'滑雪板',snowboard:'滑雪板','sports ball':'球',kite:'風箏','baseball bat':'球棒','baseball glove':'棒球手套',skateboard:'滑板',surfboard:'衝浪板','tennis racket':'球拍',bottle:'瓶子','wine glass':'玻璃杯',cup:'杯子',fork:'叉子',knife:'刀',spoon:'湯匙',bowl:'碗',banana:'香蕉',apple:'蘋果',sandwich:'三明治',orange:'柳橙',broccoli:'花椰菜',carrot:'紅蘿蔔','hot dog':'熱狗',pizza:'披薩',donut:'甜甜圈',cake:'蛋糕',chair:'椅子',couch:'沙發','potted plant':'盆栽',bed:'床','dining table':'桌子',toilet:'馬桶',tv:'螢幕',laptop:'螢幕',mouse:'滑鼠',remote:'遙控器',keyboard:'鍵盤','cell phone':'手機',microwave:'微波爐',oven:'烤箱',toaster:'烤麵包機',sink:'洗手台',refrigerator:'冰箱',book:'書',clock:'時鐘',vase:'花瓶',scissors:'剪刀','teddy bear':'玩偶','hair drier':'吹風機',toothbrush:'牙刷'};
 const VEHICLE=new Set(['car','truck','motorcycle','bicycle']); // 公車/列車已整組移除（室內誤報太兇）；飛機/船不在名單
 const P0_SCORE=0.66,P0_HITS=2; // 主動警報門檻：高信心＋連續幀，畫框仍用低閾值
 const SCREEN=new Set(['tv','laptop']);
@@ -174,11 +174,11 @@ function evaluate(dets,now){
     if(VEHICLE.has(cls)&&solid&&tier<=1&&(t.spoken===0||dir!==t.dir||now-t.spoken>COOL.vehicle)){
       cueWarn();speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
     }
-    else if(cls==='person'&&solid&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
-      cueWarn();speak('注意，前方有人靠近。',true);t.spoken=now;
-    }
-    else if(cls==='person'&&solid&&tier===0&&t.tier!==0&&now-t.spoken>COOL.person){ // 進入很近那一刻才報，站著不動不重複
+    else if(cls==='person'&&solid&&tier===0&&t.tier!==0&&now-t.spoken>COOL.person){ // 進入很近那一刻優先報方向
       cueWarn();speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
+    }
+    else if(cls==='person'&&solid&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
+      cueWarn();speak('注意，'+DIR[dir]+'有人靠近。',true);t.spoken=now;
     }
     t.seen=now;t.area=a;t.dir=dir;t.tier=tier;tracks.set(cls,t);
   }
@@ -253,7 +253,7 @@ function setTarget(on){
   targetMode=on;arrived=false;$('arrive').style.display='none';
   $('target').classList.toggle('active',on);
   $('target').textContent=on?'🎯 尋找中…（點擊停止）':'🎯 尋找機台';
-  lastGuide={dir:-1,tier:99,t:0};lastSearchNote=Date.now();kioskHits=0;kioskCand=null;
+  lastGuide={dir:-1,tier:99,t:0};lastSearchNote=Date.now()-COOL.search+5000;kioskHits=0;kioskCand=null;
   if(on){initKiosk();speak('開始尋找機台。',true);setIntent('{"intent":"find_target","target":"kiosk"}')}
   else{speak('已停止尋找。',true);setIntent('')}
 }
@@ -279,7 +279,7 @@ function loop(){
       scanned=true;
     }
   }
-  model.detect(view,10,0.45).then(function(dets){
+  model.detect(view,10,0.50).then(function(dets){
     if(scanned&&lastQR)lastQR.t=Date.now(); // 推論耗時不可預期，時效以本 tick 完成時間為準
     tickMs=Math.max(100,performance.now()-t0);
     lastDets=dets;frames++;
@@ -364,14 +364,14 @@ function stop(){
   if(synth)synth.cancel();
   $('start').textContent='▶ 開始導引';$('start').onclick=start;
   $('target').disabled=$('ask').disabled=$('mic').disabled=true;
-  setTarget(false);live.textContent='已停止。';
+  if(targetMode)setTarget(false);live.textContent='已停止。';
 }
 $('start').onclick=start;
 $('target').onclick=function(){setTarget(!targetMode)};
 $('ask').onclick=describe;
 $('mic').onclick=listen;
 /* 訪談要求「可中斷性」：點預覽或字幕＝立刻略過目前這句 */
-function hush(){if(synth&&(synth.speaking||synth.pending)){synth.cancel();live.textContent+='　⏭'}}
+function hush(){if(synth&&(synth.speaking||synth.pending)){synth.cancel();live.textContent=live.textContent.replace(/　⏭$/,'')+'　⏭'}}
 $('stage').onclick=hush;live.onclick=hush;
 function setBlackout(on){
   document.body.classList.toggle('blackout',on);

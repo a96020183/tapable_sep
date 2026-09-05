@@ -1,4 +1,4 @@
-const CACHE='tapthrough-8b159b7db8da';
+const CACHE='tapthrough-20260905a';
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.add('./index.html')).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('tapthrough-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||e.request.mode!=='navigate')return; const u=new URL(e.request.url); if(u.origin!==self.location.origin)return; e.respondWith(fetch(e.request).catch(()=>caches.open(CACHE).then(c=>c.match('./index.html'))));});
