@@ -88,7 +88,8 @@ const NOSPEECH=P.get('nospeech')==='1', AUTOSTART=P.get('autostart')==='1';
 const view=$('view'),ctx=view.getContext('2d',{willReadFrequently:true});
 const live=$('live');
 const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',airplane:'飛機',bus:'公車',train:'列車',truck:'卡車',boat:'船','traffic light':'紅綠燈','fire hydrant':'消防栓','stop sign':'停車標誌','parking meter':'停車收費表',bench:'長椅',bird:'鳥',cat:'貓',dog:'狗',horse:'馬',sheep:'羊',cow:'牛',elephant:'大象',bear:'熊',zebra:'斑馬',giraffe:'長頸鹿',backpack:'背包',umbrella:'雨傘',handbag:'手提包',tie:'領帶',suitcase:'行李箱',frisbee:'飛盤',skis:'滑雪板',snowboard:'滑雪板','sports ball':'球',kite:'風箏','baseball bat':'球棒','baseball glove':'棒球手套',skateboard:'滑板',surfboard:'衝浪板','tennis racket':'球拍',bottle:'瓶子','wine glass':'玻璃杯',cup:'杯子',fork:'叉子',knife:'刀',spoon:'湯匙',bowl:'碗',banana:'香蕉',apple:'蘋果',sandwich:'三明治',orange:'柳橙',broccoli:'花椰菜',carrot:'紅蘿蔔','hot dog':'熱狗',pizza:'披薩',donut:'甜甜圈',cake:'蛋糕',chair:'椅子',couch:'沙發','potted plant':'盆栽',bed:'床','dining table':'桌子',toilet:'馬桶',tv:'螢幕',laptop:'筆電螢幕',mouse:'滑鼠',remote:'遙控器',keyboard:'鍵盤','cell phone':'手機',microwave:'微波爐',oven:'烤箱',toaster:'烤麵包機',sink:'洗手台',refrigerator:'冰箱',book:'書',clock:'時鐘',vase:'花瓶',scissors:'剪刀','teddy bear':'玩偶','hair drier':'吹風機',toothbrush:'牙刷'};
-const VEHICLE=new Set(['car','bus','truck','motorcycle','bicycle','train']);
+const VEHICLE=new Set(['car','bus','truck','motorcycle','bicycle']); // 列車/飛機/船只畫框不警報：室內誤報代價太高
+const P0_SCORE=0.66,P0_HITS=2; // 主動警報門檻：高信心＋連續幀，畫框仍用低閾值
 const SCREEN=new Set(['tv','laptop']);
 const TIERS=[[0.30,'很近'],[0.11,'近'],[0.035,'中距離'],[0,'遠']];
 const tierOf=a=>TIERS.findIndex(t=>a>=t[0]);
@@ -97,7 +98,7 @@ const dirOf=cx=>cx<0.35?0:cx<=0.65?1:2;
 const DIR=['左前方','正前方','右前方'], CLOCK=['十點鐘方向','十二點鐘方向','兩點鐘方向'];
 
 let model=null,video=null,running=false,frames=0,errors=0,lastDets=[],lastQR=null;
-let targetMode=false,arrived=false,lastGuide={dir:-1,tier:99,t:0},lastHint=0,lastSearchNote=0;
+let targetMode=false,arrived=false,lastGuide={dir:-1,tier:99,t:0},lastHint=0,lastSearchNote=0,tickMs=200;
 const tracks=new Map(); // cls -> {seen,area,dir,tier,spoken}
 window.__V={get ready(){return !!model},get frames(){return frames},get errors(){return errors},get dets(){return lastDets}};
 
@@ -122,21 +123,25 @@ function evaluate(dets,now){
     const cls=d.class; if(!(cls in ZH))continue;
     const g=geom(d),a=g[0],cx=g[1];
     const dir=dirOf(cx),tier=tierOf(a);
-    const t=tracks.get(cls)||{seen:0,area:a,dir:dir,tier:tier,spoken:0};
-    const fresh=now-t.seen>3000;
-    if(VEHICLE.has(cls)&&tier<=1&&(fresh||dir!==t.dir||now-t.spoken>COOL.vehicle)){
+    const t=tracks.get(cls)||{seen:0,area:a,dir:dir,tier:tier,spoken:0,hits:0};
+    const fresh=now-t.seen>Math.max(3000,tickMs*2.5); // 窗口隨實際推論節奏放大，慢裝置不會把連續目擊誤判成新物件
+    t.hits=fresh?1:t.hits+1;
+    const solid=d.score>=P0_SCORE&&t.hits>=P0_HITS; // 夠有把握才准開口
+    if(VEHICLE.has(cls)&&solid&&tier<=1&&(t.spoken===0||dir!==t.dir||now-t.spoken>COOL.vehicle)){
       speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
     }
-    else if(cls==='person'&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
+    else if(cls==='person'&&solid&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
       speak('注意，前方有人靠近。',true);t.spoken=now;
     }
-    else if(cls==='person'&&fresh&&tier===0&&now-t.spoken>COOL.person){
+    else if(cls==='person'&&solid&&tier===0&&t.tier!==0&&now-t.spoken>COOL.person){ // 進入很近那一刻才報，站著不動不重複
       speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
     }
     t.seen=now;t.area=a;t.dir=dir;t.tier=tier;tracks.set(cls,t);
   }
   if(targetMode&&!arrived)guideTarget(dets,now);
 }
+window.__V.evaluate=function(dets){evaluate(dets,Date.now())}; // 測試掛鉤：注入合成偵測結果
+window.__V.track=function(cls){return tracks.get(cls)||null};
 
 /* ---------- 目標導引（機台） ---------- */
 function guideTarget(dets,now){
@@ -221,6 +226,7 @@ function loop(){
   }
   model.detect(view,10,0.45).then(function(dets){
     if(scanned&&lastQR)lastQR.t=Date.now(); // 推論耗時不可預期，時效以本 tick 完成時間為準
+    tickMs=Math.max(100,performance.now()-t0);
     lastDets=dets;frames++;
     evaluate(dets,Date.now());
     draw(dets);
