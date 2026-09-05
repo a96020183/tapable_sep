@@ -4,7 +4,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const scripts = ['op-p0.js', 'op-p1-voice.js', 'op-p2.js', 'op-hardening.js', 'op-llm.js'];
+const scripts = ['op-p0.js', 'op-p1-voice.js', 'op-p2.js', 'op-hardening.js', 'op-llm.js', 'op-start.js'];
 const failures = []; let pass = 0, fail = 0;
 for (const s of scripts) {
   console.log(`=== ${s} ===`);

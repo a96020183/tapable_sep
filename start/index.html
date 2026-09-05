@@ -83,7 +83,7 @@ footer{margin-top:24px;color:var(--muted);font-size:.8rem;border-top:1px solid v
       audio.addEventListener('ended',function(){ label(false); state.textContent='導覽播放完畢。'; });
       audio.addEventListener('error',function(){ label(false); state.textContent='音檔無法播放，請看下方逐字稿。'; });
     }
-    if(audio.paused){ audio.play().then(function(){ label(true); state.textContent=''; }).catch(function(){ state.textContent='瀏覽器擋下自動播放，請再按一次。'; }); }
+    if(audio.paused){ audio.play().then(function(){ label(true); state.textContent=''; }).catch(function(){ label(false); state.textContent=audio.error?'音檔無法播放，請看下方逐字稿。':'瀏覽器擋下自動播放，請再按一次。'; }); }
     else { audio.pause(); label(false); state.textContent='已暫停。'; }
   });
 })();
