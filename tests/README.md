@@ -39,6 +39,14 @@ node tests/intent/parseIntent2.test.js   # 不需伺服器、不需瀏覽器
 直接從 `index.html` 抽出實際出貨的 `parseIntent2` 來測，副本不會跟本體走鐘；
 另含一條與機台資料（服務 id／enabled／學年期）的唯讀交叉比對。
 
+## 規則式 vs LLM 實測對照（重現 README 那張表）
+
+```bash
+node tests/intent/bench-live.js   # 需要網路，會呼叫代理 8 次
+```
+
+結果會隨模型與網路浮動，用途是讓人自己驗證，不是回歸測試。
+
 ## 機台操作段（index.html）回歸
 
 ```bash
