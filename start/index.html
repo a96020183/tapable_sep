@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080d">
+<title>TapAble · Demo 入口</title>
+<style>
+:root{color-scheme:dark;--bg:#05080d;--panel:#101823;--line:#3d4c60;--fg:#f2f6fb;--muted:#aab8c9;--accent:#8fe3cf;font-family:system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-size:17px;line-height:1.6;padding:20px 16px 40px;max-width:720px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0;color:var(--fg);text-decoration:none;min-height:52px}
+a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+a.card.primary{border-color:var(--accent)}
+.t{font-weight:700;font-size:1.1rem;color:var(--accent)}
+.d{color:var(--muted);font-size:.95rem;margin-top:4px}
+.tag{display:inline-block;font-size:.75rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:6px;color:var(--muted);vertical-align:middle}
+.flow{background:#0b1220;border-left:3px solid var(--accent);padding:10px 14px;border-radius:8px;color:var(--muted);font-size:.95rem;margin:18px 0}
+footer{margin-top:24px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<h1>TapAble — 你的手機，接管機台</h1>
+<p class="sub">視障者用自己的手機操作沒有無障礙功能的觸控機台，機台零硬體改造。兩個 demo 是同一段旅程的兩個接力。</p>
+
+<a class="card primary" href="../?demo=1">
+  <div class="t">📳 機台操作 demo <span class="tag">主要作品</span><span class="tag">不需硬體</span></div>
+  <div class="d">NFC 碰一下之後的語音接管：選件 → 確認 → 付款 → 取件。此連結為「模擬付款」模式，電腦或手機直接開就能走完全流程。</div>
+</a>
+
+<a class="card" href="../vision/">
+  <div class="t">📷 鏡頭導引 demo <span class="tag">需手機相機</span></div>
+  <div class="d">最後十公尺：手機後鏡頭端側辨識，把使用者帶到機台正前方，抵達後交棒給操作段。請用手機開啟並允許相機。</div>
+</a>
+
+<a class="card" href="../vision/?marker=1">
+  <div class="t">🖥 模擬機台標記頁 <span class="tag">搭配鏡頭 demo</span></div>
+  <div class="d">開在另一台筆電／平板上全螢幕放著，它就是鏡頭 demo 要找的「目標機台」（會場沒有真機台的替代品）。</div>
+</a>
+
+<div class="flow">建議體驗順序：筆電開「模擬機台標記頁」→ 手機開「鏡頭導引 demo」走近 → 抵達後按交棒 → 自動進入「機台操作 demo」完成列印。</div>
+
+<a class="card" href="https://ken-chui.vercel.app/yao-3s-demo/">
+  <div class="t">🗺 無障礙空間資訊 demo <span class="tag">長期路線</span></div>
+  <div class="d">WebGIS：視障人口熱區、服務缺口、無障礙路徑 —— 決定「下一張貼紙該貼哪裡」的資料層。</div>
+</a>
+
+<a class="card" href="https://github.com/a96020183/tapable_sep/blob/main/README.md">
+  <div class="t">📄 技術文件（README）</div>
+  <div class="d">架構、執行方式、誠實揭露、第三方元件與參考來源。</div>
+</a>
+
+<footer>影像僅於裝置端即時處理，不儲存、不上傳。機台畫面為模擬；真機履約需機構合作，屬下一階段。</footer>
+</body>
+</html>
