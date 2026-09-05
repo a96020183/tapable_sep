@@ -454,7 +454,8 @@ globalThis.TT = globalThis.TT || {};
       currentCopy=machineId?'無法識別這台機器，請確認連結。':'等待連接機台。';
     } else {
       $('main').innerHTML=pages[session.state]();
-      currentCopy=$('main').querySelector('h1').textContent+'。';
+      // 標題本身已有問號／驚嘆號時不再補句號，避免朗讀成「需要幾份？。」
+      { const h=$('main').querySelector('h1').textContent.trim(); currentCopy=/[。！？]$/.test(h)?h:h+'。'; }
       if(session.state==='CONNECTED') currentCopy=`NFC 已感應，這是${machine.organization}${machine.machineName}。請按開始操作。這是本機互動原型。`;
       // REVIEW 覆誦申請內容與金額（隱私模式黑屏也照念，只有耳機聽得到）
       if(session.state==='REVIEW') currentCopy+=`${session.service.name}${session.order.rank?'，'+session.order.rank:''}${session.order.semester?'，'+session.order.semester:''}，${session.order.copies} 份，總金額 ${session.total} 元。`;
