@@ -419,6 +419,7 @@ $('blackout').onchange=function(e){setBlackout(e.target.checked)};
 $('exitBlack').onclick=function(){setBlackout(false)};
 window.addEventListener('error',function(){errors++});
 if(AUTOSTART)start();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('../sw.js').catch(function(){}); // 離線快取（模型下載一次後斷網也能開）
 }
 </script>
 </body>
