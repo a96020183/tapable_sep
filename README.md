@@ -5,6 +5,18 @@
 >
 > BUILDMODE GEN-AI HACKATHON 2026 · Track 05「AI for Taiwan / Social Impact」參賽作品
 
+## ⏱ 評審 60 秒試玩
+
+1. 手機或電腦開 **https://a96020183.github.io/tapable_sep/?machine=campus-document-kiosk&demo=1** → 按「開始操作」，語音會自動開始（畫面下方字幕列同步顯示它說了什麼、聽到什麼）
+2. 在「選擇文件」「份數」「確認申請」任一步按 **🎤 用語音選擇**，說「在學證明兩份」或「確認」→ 它會覆誦、你按確認才執行（沒麥克風就直接點選，流程一樣）
+3. 付款步驟按 **「Demo：模擬機台收款完成」** → 列印 → 完成頁「文件已印出」。想看投影版加 `&stage=1`；想看鏡頭導引開 `/vision/`（需手機相機）
+
+<p>
+<img src="docs/img/phone-connected.png" alt="手機畫面：NFC 已感應，校園文件自動服務機，開始操作" width="260">
+&nbsp;&nbsp;
+<img src="docs/img/stage-completed.png" alt="投影模式：手機外框內顯示文件已印出與再辦一件按鈕" width="560">
+</p>
+
 ## 🎬 兩分鐘看懂
 
 - **Demo 入口頁（一個網址看全部）**：https://a96020183.github.io/tapable_sep/start/
