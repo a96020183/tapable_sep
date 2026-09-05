@@ -7,6 +7,10 @@ python -m http.server 4302        # repo 根目錄
 OP_PORT=4302 node tests/a11y/axe-audit.js   # 入口頁＋操作段 15 步驟＋隱私模式黑屏＋鏡頭段，共 18 個畫面
 ```
 
+```bash
+OP_PORT=4302 node tests/a11y/keyboard.js    # 純鍵盤操作 6 項（等同讀屏的巡覽順序）
+```
+
 需要網路（axe-core 由 cdnjs 載入）。目前結果：**18 個畫面、違規 0 項**。
 自動檢測只能涵蓋部分規則，不能取代真人測試 —— 另有戴眼罩實測與視障者訪談。
 
@@ -24,6 +28,16 @@ node tests/vision/v2-feedback_bugs.js    # 多實例去重
 ```
 
 每支腳本逐行輸出 `PASS | 編號 | 說明`。抵達交棒流程另需以假相機餵 QR 影像，見腳本註解。
+
+
+## 語音意圖解析單元測試（85 項，純 Node）
+
+```bash
+node tests/intent/parseIntent2.test.js   # 不需伺服器、不需瀏覽器
+```
+
+直接從 `index.html` 抽出實際出貨的 `parseIntent2` 來測，副本不會跟本體走鐘；
+另含一條與機台資料（服務 id／enabled／學年期）的唯讀交叉比對。
 
 ## 機台操作段（index.html）回歸
 

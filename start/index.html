@@ -74,6 +74,8 @@ footer{margin-top:24px;color:var(--muted);font-size:.8rem;border-top:1px solid v
 
 <footer>影像僅於裝置端即時處理，不儲存、不上傳。機台畫面為模擬；真機履約需機構合作，屬下一階段。</footer>
 <script>
+// 入口頁常是 QR 掃進來的第一頁：自己註冊 Service Worker，之後斷網也還能用
+if('serviceWorker' in navigator) navigator.serviceWorker.register('../sw.js',{scope:'../'}).catch(function(){});
 (function(){
   var btn=document.getElementById('intro-play'), state=document.getElementById('intro-state'), audio=null;
   function label(playing){ btn.textContent=playing?'⏸ 暫停語音導覽':'▶︎ 播放 60 秒語音導覽'; }

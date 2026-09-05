@@ -102,7 +102,7 @@ async function doubleTap(page, selector, gapMs) {
       });
       await C.sleep(150);
       const r = await page.evaluate(() => ({ status: (document.getElementById('voice-status') || {}).textContent, heard: (document.getElementById('caption-heard') || {}).textContent, result: (document.getElementById('voice-result') || {}).innerHTML, aborts: window.__recAborts }));
-      C.check('H2-1', '聆聽中派發 visibilitychange（hidden）→ #voice-status／#caption-heard 顯示已停止聆聽，#voice-result 清空', /聆聽中|正在聆聽/.test(norm(listening)) && /已停止聆聽/.test(norm(r.status)) && /已停止聆聽/.test(norm(r.heard)) && norm(r.result) === '' && r.aborts >= 1 && errors.length === 0, JSON.stringify({ before: norm(listening).slice(0, 30), status: norm(r.status).slice(0, 40), heard: norm(r.heard).slice(0, 40), result: r.result, aborts: r.aborts }));
+      C.check('H2-1', '聆聽中派發 visibilitychange（hidden）→ #voice-status／#caption-heard 顯示已取消，#voice-result 清空', /聆聽中|正在聆聽/.test(norm(listening)) && /已取消|已停止/.test(norm(r.status)) && /已取消|已停止/.test(norm(r.heard)) && norm(r.result) === '' && r.aborts >= 1 && errors.length === 0, JSON.stringify({ before: norm(listening).slice(0, 30), status: norm(r.status).slice(0, 40), heard: norm(r.heard).slice(0, 40), result: r.result, aborts: r.aborts }));
       await page.context().close();
     }
 

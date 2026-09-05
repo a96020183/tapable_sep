@@ -364,9 +364,11 @@ globalThis.TT = globalThis.TT || {};
   };
   function cancelRecognition() {
     ++voiceToken; if(recognition) { recognition.abort(); recognition=null; } voiceCandidate=null;
+    abortProxy();   // 連同進行中的雲端解析一起中止，不留背景請求
+    if($('voice-start')) $('voice-start').disabled=false;
     // P2-1 聆聽中被中止（切背景、開設定、切隱私）：同步把聆聽 UI 改為已停止，避免卡在「正在聆聽」
     if($('voice-cancel')) {
-      const text='已停止聆聽，請重新按用語音選擇。';
+      const text='已取消，請重新按用語音選擇。';
       $('voice-result').innerHTML=''; if($('voice-status')) $('voice-status').textContent=text; $('caption-heard').textContent=text;
     }
   }
@@ -524,7 +526,8 @@ globalThis.TT = globalThis.TT || {};
     $('caption-heard').textContent=text;
     $('voice-start')?.focus(); announce(text,true);
   }
-  // ===== 語音意圖解析（規則式，全程在瀏覽器內；不送出任何資料） =====
+  // ===== 語音意圖解析第一層：規則式，全程在瀏覽器內、不送出任何資料 =====
+  // （第二層是下面的 LLM 代理；規則式同時也是代理失敗時的備援）
   const enabledServices=()=>machine.availableServices.filter(s=>s.enabled);
   function parseIntent2(transcript, state, machine, context) {
     // ---------- 對照表 ----------
@@ -679,7 +682,12 @@ globalThis.TT = globalThis.TT || {};
     if(!raw||typeof raw!=='object') return null;
     const out={};
     if(state==='SERVICE'&&typeof raw.service==='string'&&enabledServices().some(s=>s.id===raw.service)) out.service=raw.service;
-    if(['SERVICE','COPIES'].includes(state)) { const c=Number(raw.copies); if(Number.isInteger(c)&&c>=1&&c<=5) out.copies=c; }
+    if(['SERVICE','COPIES'].includes(state)) {
+      // 上限跟著服務走，不寫死：SERVICE 用剛判出的那項服務，COPIES 用目前這一筆的服務
+      const svc=state==='COPIES'?session?.service:enabledServices().find(s=>s.id===out.service);
+      const max=Number.isInteger(svc?.maxCopies)?svc.maxCopies:5;
+      const c=Number(raw.copies); if(Number.isInteger(c)&&c>=1&&c<=max) out.copies=c;
+    }
     if(state==='REVIEW'&&['CONFIRM','BACK'].includes(raw.action)) out.action=raw.action;
     if(state==='SEMESTER'&&machine.semesters.includes(raw.semester)) out.semester=raw.semester;
     const ok={SERVICE:!!out.service,COPIES:!!out.copies,REVIEW:!!out.action,SEMESTER:!!out.semester}[state];
@@ -689,15 +697,26 @@ globalThis.TT = globalThis.TT || {};
   // key 只存在代理的環境變數，不在前端；離線、逾時或格式不符時自動退回上面的規則式解析。
   const LLM_PROXY='https://tapable-intent.vercel.app/api/intent';
   const cloudLLMEnabled=()=>{ try { return localStorage.getItem('tapable.llm.cloud')!=='0'; } catch { return true; } };
+  // 逾時 2.5 秒：實測熱路徑往返 0.8–1.5 秒；等更久對看不見畫面的人只是更長的沉默，
+  // 不如早點退回裝置端規則式。proxyOutcome 讓 UI 能分辨「解析不出來」與「雲端沒回應」。
+  const PROXY_TIMEOUT_MS=2500;
+  let proxyOutcome='', proxyController=null;
+  function abortProxy() { if(proxyController) { proxyController.abort(); proxyController=null; } }
   async function parseIntentProxy(transcript,state,ctx) {
+    proxyOutcome='';
     if(!LLM_PROXY||!VOICE_STATES[state]) return null;
-    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),5000);
+    abortProxy();
+    const controller=new AbortController(); proxyController=controller;
+    const timer=setTimeout(()=>controller.abort(),PROXY_TIMEOUT_MS);
     try {
       const res=await fetch(LLM_PROXY,{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json'},
         body:JSON.stringify({transcript:String(transcript),state,services:ctx.services,maxCopies:ctx.maxCopies,semesters:ctx.semesters})});
-      if(!res.ok) return null;
-      return sanitizeIntent(await res.json(),state);
-    } catch { return null; } finally { clearTimeout(timer); }
+      if(!res.ok) { proxyOutcome='error'; return null; }
+      const out=sanitizeIntent(await res.json(),state);
+      proxyOutcome=out?'ok':'empty';
+      return out;
+    } catch { proxyOutcome='error'; return null; }
+    finally { clearTimeout(timer); if(proxyController===controller) proxyController=null; }
   }
   // ===== 選用：改用自己的 LLM 端點（設定只存 localStorage；key 不進原始碼、不進 console） =====
   const LLM_DEFAULTS={endpoint:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini'};
@@ -765,11 +784,20 @@ globalThis.TT = globalThis.TT || {};
       const shown=transcript.length>120?transcript.slice(0,120)+'…':transcript;
       let intent=null, source='關鍵字比對';
       const ownKey=!!llmConfig().key, useCloud=!ownKey&&cloudLLMEnabled();
+      let cloudDown=false;
       if(ownKey||useCloud) {
-        $('voice-status').textContent='正在以 LLM 解析……';
-        intent=ownKey?await parseIntentLLM(parsable,state,voiceContext(state)):await parseIntentProxy(parsable,state,voiceContext(state));
+        // 解析要花 1–3 秒。對看不見畫面的人，這段時間絕不能靜默，字幕列也不能繼續說「聆聽中」。
+        const waiting='已聽到，正在解析，請稍候。';
+        $('voice-status').textContent=waiting;
+        $('caption-heard').textContent=`已聽到：${shown}。正在解析……`;
+        announce(waiting);
+        $('voice-result').innerHTML='<button id="voice-cancel" type="button">取消解析</button>';
+        if($('voice-start')) $('voice-start').disabled=true;   // 解析中不再受理新的語音，避免重複送出
+        try { intent=ownKey?await parseIntentLLM(parsable,state,voiceContext(state)):await parseIntentProxy(parsable,state,voiceContext(state)); }
+        finally { if($('voice-start')) $('voice-start').disabled=false; }
         if(token!==voiceToken||session.state!==state) return;
         if(intent) source='LLM 解析';
+        else if(useCloud&&proxyOutcome==='error') cloudDown=true;
       }
       let unavailableMsg='';
       if(!intent) {
@@ -783,14 +811,15 @@ globalThis.TT = globalThis.TT || {};
       if(intent?.copies&&intent.copies>(session.service?.maxCopies||5)&&state==='COPIES') intent=null;
       voiceCandidate=intent?{intent,state}:null;
       const heard=intent?describeIntent(intent,state):'';
-      $('voice-status').textContent=intent?`已辨識（${source}）。請確認後才會套用。`:(unavailableMsg||`沒有找到對應選項（${source}）。請重新說一次，或使用畫面選項。`);
+      const failMsg=unavailableMsg||(cloudDown?'雲端解析暫時無法連線，已改用裝置端比對。請直接說出文件名稱，或使用畫面選項。':`沒有找到對應選項（${source}）。請重新說一次，或使用畫面選項。`);
+      $('voice-status').textContent=intent?`已辨識（${source}）。請確認後才會套用。`:failMsg;
       $('voice-result').innerHTML=`<p id="heard"></p>${intent?'<button type="button" id="voice-confirm"></button>':''}<button type="button" id="voice-retry">重新說一次</button>`;
       // 辨識結果只用 textContent，不當 HTML 或指令處理
       $('heard').textContent=intent?`我聽到：${shown}（解析為：${heard}）`:`我聽到：${shown}`;
       $('caption-heard').textContent=$('heard').textContent; // 字幕列同步逐字稿（純文字）
       if(intent) $('voice-confirm').textContent=`確認：${heard}`;
       $(intent?'voice-confirm':'voice-retry').focus();
-      const readback=intent?`我聽到${heard}，請確認。`:(unavailableMsg||'沒有找到對應選項，請重新說一次。');
+      const readback=intent?`我聽到${heard}，請確認。`:(unavailableMsg||(cloudDown?'雲端解析暫時無法連線，已改用裝置端比對，請直接說出文件名稱。':'沒有找到對應選項，請重新說一次。'));
       announce(readback); speech.speak(readback,sensitive());
     };
     rec.onerror=e=>{ if(token===voiceToken&&!resolved) recognitionFailure(e.error); };

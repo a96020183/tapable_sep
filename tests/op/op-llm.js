@@ -120,6 +120,63 @@ const jsonBody = obj => ({ status: 200, contentType: 'application/json', body: J
       await page.context().close();
     }
 
+    // ---------- L7 解析期間不得對螢幕閱讀器靜默（對抗測試 P1-1）----------
+    {
+      let release;
+      const gate = new Promise(r => { release = r; });
+      const ctx = await cloudPage(browser, async route => { await gate; return route.fulfill(jsonBody({ service: 'english', copies: 1 })); });
+      const page = ctx.page;
+      await page.goto(C.DEMO_URL);
+      await C.goTo(page, 'SERVICE'); await C.sleep(150);
+      await page.evaluate(() => { window.__transcript = '我要那個給國外學校看的文件'; });
+      await page.click('#voice-start');
+      // 停在「解析中」這個瞬間取樣：代理回應還沒放行
+      await C.waitFor(page, `/正在解析/.test((document.getElementById('voice-status')||{}).textContent||'')`, 5000);
+      const mid = await page.evaluate(() => ({
+        announcer: (document.getElementById('announcer') || {}).textContent || '',
+        caption: (document.getElementById('caption-heard') || {}).textContent || '',
+        cancel: (document.getElementById('voice-cancel') || {}).textContent || '',
+        startDisabled: !!(document.getElementById('voice-start') || {}).disabled
+      }));
+      C.check('L7a', '解析期間以 aria-live 播報「正在解析」，讀屏使用者不會遇到沉默', /正在解析/.test(mid.announcer), `announcer=${mid.announcer.slice(0, 60)}`);
+      C.check('L7b', '解析期間字幕列不再宣稱「聆聽中」（實際上已停止聆聽）', !/聆聽中/.test(mid.caption) && /正在解析/.test(mid.caption), `caption=${mid.caption.slice(0, 60)}`);
+      C.check('L7c', '解析期間按鈕改為「取消解析」，且語音鍵停用避免重複送出', /取消解析/.test(mid.cancel) && mid.startDisabled, `按鈕=${mid.cancel} 停用=${mid.startDisabled}`);
+      release();
+      await C.waitFor(page, `!!document.querySelector('#voice-confirm,#voice-retry')`, 5000);
+      const after = await page.evaluate(() => ({ disabled: !!(document.getElementById('voice-start') || {}).disabled }));
+      C.check('L7d', '解析結束後語音鍵恢復可用', after.disabled === false, `停用=${after.disabled}`);
+      await page.context().close();
+    }
+
+    // ---------- L8 逾時與「雲端沒回應」的文案分流 ----------
+    {
+      const ctx = await cloudPage(browser, async route => { await new Promise(r => setTimeout(r, 4000)); return route.fulfill(jsonBody({ service: 'english' })); });
+      const page = ctx.page;
+      await page.goto(C.DEMO_URL);
+      await C.goTo(page, 'SERVICE'); await C.sleep(150);
+      await page.evaluate(() => { window.__transcript = '歷年成績表'; });
+      const t0 = Date.now();
+      await page.click('#voice-start');
+      await C.waitFor(page, `!!document.querySelector('#voice-confirm,#voice-retry')`, 8000);
+      const elapsed = Date.now() - t0;
+      const status = await page.evaluate(() => (document.getElementById('voice-status') || {}).textContent || '');
+      C.check('L8a', '代理超過 2.5 秒未回應即放棄，不讓使用者空等（實測 < 3.5 秒收斂）', elapsed < 3500, `耗時=${elapsed}ms`);
+      C.check('L8b', '逾時後仍以規則式完成辨識，流程不中斷', /關鍵字比對/.test(status), `status=${status.slice(0, 70)}`);
+      await page.context().close();
+    }
+    {
+      const ctx = await cloudPage(browser, route => route.abort('connectionfailed'));
+      const page = ctx.page;
+      await page.goto(C.DEMO_URL);
+      await C.goTo(page, 'SERVICE'); await C.sleep(150);
+      await page.evaluate(() => { window.__transcript = '我要那個給國外學校看的文件'; });
+      await page.click('#voice-start');
+      await C.waitFor(page, `!!document.querySelector('#voice-confirm,#voice-retry')`, 8000);
+      const status = await page.evaluate(() => (document.getElementById('voice-status') || {}).textContent || '');
+      C.check('L8c', '雲端連不上且規則式也判不出時，明說是「雲端無法連線」而非「沒有找到對應選項」', /雲端解析暫時無法連線/.test(status), `status=${status.slice(0, 80)}`);
+      await page.context().close();
+    }
+
     // ---------- L6 身分輸入步驟永遠不送出語音 ----------
     {
       const ctx = await cloudPage(browser, route => route.fulfill(jsonBody({ service: 'english' })));
