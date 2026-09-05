@@ -10,23 +10,56 @@
 *{box-sizing:border-box}body{margin:0 auto;max-width:640px;padding:0 22px 26px;overflow-wrap:anywhere}button,input,select{font:inherit}button,summary,input,select{touch-action:manipulation}button{min-height:52px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:inherit;padding:12px 18px;cursor:pointer;text-align:center;line-height:1.45}button:hover{border-color:var(--accent)}button:disabled{opacity:.6;cursor:not-allowed}button.primary{background:var(--accent);color:var(--ink);border-color:var(--accent);font-weight:750;width:100%;min-height:62px}button.secondary{width:100%}button.choice{display:block;width:100%;text-align:left;margin:10px 0;padding:18px}button.choice small{display:block;color:var(--muted);font-size:.85rem;margin-top:5px}h1{font-size:clamp(1.8rem,6.8vw,2.4rem);line-height:1.25;letter-spacing:-.035em;margin:14px 0 20px}h2{line-height:1.3}p{margin:10px 0 20px}a{color:var(--accent)}:focus-visible,h1:focus,h2:focus{outline:3px solid #ffdf8a;outline-offset:5px}h1:focus,h2:focus{border-radius:3px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:24px 0 18px}.brand{font-size:1.18rem;font-weight:800;letter-spacing:-.04em}.brand-dot{color:var(--accent);font-size:.58rem;vertical-align:super;margin-left:5px}.top button{font-size:.85rem;min-height:48px;padding:8px 15px}.mode-label{font-size:.8rem;color:var(--accent);letter-spacing:.03em;margin:0 0 18px}.muted,footer{color:var(--muted)}.journey{border-top:1px solid var(--line);padding-top:15px}.journey p{font-size:.85rem;margin:0 0 9px}.progress-track{display:flex;gap:4px;margin:14px 0}.progress-track i{height:4px;flex:1;border-radius:9px;background:#344257}.progress-track i.done{background:var(--accent)}#clock{font-size:.8rem}main{padding:12px 0 8px;min-height:320px}.eyebrow{color:var(--accent);font-size:.9rem}.instruction{font-size:1.05rem}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;margin:20px 0}.card p:last-child{margin-bottom:0}.note{border-left:3px solid var(--accent);padding:0 0 0 16px;color:var(--muted)}.warning{border-color:#ffdf8a;color:#ffdf8a}.actions{display:grid;gap:12px;margin:28px 0 8px}.guide-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.guide-controls button{font-size:.9rem}details{border-top:1px solid var(--line);padding:15px 0}summary{cursor:pointer;min-height:48px;padding:10px 0;font-size:.9rem}li{margin-bottom:10px}li[aria-current=step]{color:var(--accent);font-weight:700}footer{font-size:.78rem;padding:12px 0}footer p{margin-bottom:8px}label{display:block;margin:14px 0 6px}input:not([type=checkbox]):not([type=radio]):not([type=range]),select{width:100%;min-width:0;background:var(--bg);color:inherit;border:1px solid var(--line);border-radius:12px;padding:13px;min-height:52px}input[type=range]{width:100%;min-height:48px}input[type=checkbox],input[type=radio]{width:24px;height:24px;flex:0 0 24px;accent-color:var(--accent)}.check{display:flex;gap:12px;align-items:center;min-height:52px}.check:has(input:checked){color:var(--accent)}fieldset{min-width:0;border:1px solid var(--line);border-radius:14px;margin:20px 0;padding:12px}legend{padding:0 6px}.stack{display:grid;gap:10px}dl{margin:0}dl div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:12px 0}dt{color:var(--muted)}dd{margin:0;text-align:right;max-width:65%}.total{font-size:1.3rem;color:var(--accent);font-weight:750}.error-text{color:#ffcbc4}.status-icon{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--ink);font-size:1.7rem;font-weight:700;margin:12px 0 26px}.pulse{border:3px solid #3b605a;border-top-color:var(--accent);border-radius:50%;width:40px;height:40px;animation:spin 1.5s linear infinite;margin:20px 0}@keyframes spin{to{transform:rotate(360deg)}}dialog{background:var(--bg);color:inherit;border:1px solid var(--line);border-radius:20px;width:min(570px,calc(100% - 24px));max-height:90dvh;padding:24px}dialog::backdrop{background:#000c}dialog>button{margin:6px 0}.sr-only,.skip:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}.skip:focus{display:block;padding:16px}.private-banner{padding:20px 0}.private #surface{opacity:0}.private{background:#000}.private .mode-label{visibility:hidden}.private dialog{background:#000}.large{font-size:24px}.contrast{--bg:#000;--panel:#000;--line:#fff;--muted:#fff;--accent:#adffe5;background:#000;color:#fff}[hidden]{display:none!important}@media(max-width:360px){body{padding-left:16px;padding-right:16px}dl div{display:block}dd{text-align:left;max-width:100%}.top{gap:8px}dialog{padding:18px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
 
 .swipe-enabled #main,.swipe-enabled #main button{touch-action:pan-y pinch-zoom}#swipe-hint{font-size:.85rem;margin-top:18px}
-/* 投影模式（stage=1）：在 .large 之上再放大標題與指示約 1.2 倍 */
-.stage h1{font-size:calc(clamp(1.8rem,6.8vw,2.4rem)*1.2)}.stage h2{font-size:1.8em}.stage .instruction{font-size:1.26rem}
+/* 投影模式（stage=1）：在 .large 之上再放大標題與指示 */
+.stage h2{font-size:1.8em}.stage .instruction{font-size:1.26rem}.stage #caption{font-size:1.05rem}
+/* R2-1 語音字幕列：說出的話＋聽到的逐字稿（隱私模式隨 #surface 一起隱藏） */
+#caption{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:10px 14px;margin:6px 0 0;font-size:.95rem;line-height:1.5}
+#caption p{margin:0}#caption p+p{margin-top:6px;color:var(--muted)}#caption p:empty{display:none}
+#caption-say::before{content:"語音：";color:var(--accent);font-weight:700}#caption-say.silent::before{content:"靜音："}
+/* R2-7 主要按鈕列：黏在可視區底部安全區 */
+#action-bar{position:sticky;bottom:0;z-index:3;margin:24px -8px 0;padding:12px 8px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);box-shadow:0 -14px 14px -8px var(--bg);grid-template-columns:1fr 1fr}
+#action-bar>*{grid-column:1/-1}#action-bar>.secondary:nth-child(2):nth-last-child(2),#action-bar>.secondary:nth-child(3):last-child{grid-column:auto}
+/* R2-5 NFC 感應脈衝圈（prefers-reduced-motion 時由上方通則停止動畫） */
+.tap-anim{position:relative;width:72px;height:72px;border-radius:50%;background:var(--accent);color:var(--ink);display:grid;place-items:center;font-weight:800;font-size:.9rem;letter-spacing:.04em;margin:12px 0 26px}
+.tap-anim::before,.tap-anim::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:tap-pulse 1.8s ease-out infinite}.tap-anim::after{animation-delay:.9s}
+@keyframes tap-pulse{from{transform:scale(1);opacity:.8}to{transform:scale(1.9);opacity:0}}
+/* R2-6 完成頁 */
+.done-hero{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 20px;margin:0 0 20px}.done-hero .status-icon{margin:0 0 16px}.done-hero h1{margin:0 0 12px}.done-hero p{margin:0;font-size:1.05rem}
+/* R2-4 開發者面板 */
+#dev-panel section{padding:6px 0}#dev-panel h3{font-size:.95rem;color:var(--muted);margin:12px 0 6px}#dev-panel ol{padding-left:22px}
+/* R2-3 手機外框：stage=1 或視窗 ≥900px（由 JS 加 html.framed）。預設外框不產生盒子、狀態列不顯示 */
+.phone-frame{display:contents}.status-bar{display:none}
+html.framed{--frame-h:min(900px,calc(100dvh - 24px));background:#02050a}
+.framed body{max-width:none;padding:12px 16px;display:flex;justify-content:center;align-items:flex-start;min-height:100dvh}
+.framed .top{padding:12px 0 10px}.framed .mode-label{margin-bottom:10px}
+.framed .phone-frame{display:block;width:min(430px,100%);height:var(--frame-h);min-height:480px;background:var(--bg);border:10px solid #1b2531;border-radius:44px;box-shadow:0 30px 80px #000c,inset 0 0 0 1px #2c3a4b;overflow:auto;overscroll-behavior:contain;padding:0 22px;scrollbar-width:none}.framed footer{padding-bottom:26px}
+.framed .phone-frame::-webkit-scrollbar{display:none}
+.framed .status-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.8rem;color:var(--muted);padding:12px 8px 0;position:sticky;top:0;z-index:4;background:var(--bg)}
+.framed h1{font-size:2rem}.framed.stage .phone-frame{width:min(480px,100%)}
+.framed.private .phone-frame,.framed.private .status-bar{background:#000;border-color:#000}
+@media(max-width:480px){.framed body{padding:8px 4px}.framed .phone-frame{border-width:6px;border-radius:28px;padding:0 16px;--frame-h:calc(100dvh - 16px)}}
 </style>
+<link rel="icon" href="data:,">
 </head>
 <body>
 <a class="skip" href="#step-title">跳到目前步驟</a>
+<div class="phone-frame" id="phone-frame">
+<div class="status-bar" aria-hidden="true"><span id="status-time">--:--</span><span>TapAble</span><span>▂▄▆ ▮▮▮▯</span></div>
 <header class="top"><span class="brand">TapAble<span class="brand-dot" aria-hidden="true">●</span></span><button id="settings-open" type="button">設定</button></header>
 <div class="mode-label" id="mode-label"></div>
 <div class="private-banner" id="private-banner" hidden><strong>隱私模式</strong><p>敏感資訊不會顯示在螢幕上。螢幕閱讀器仍可操作。</p><button id="private-exit" type="button">關閉隱私模式</button></div>
 <div id="surface">
 <div class="journey"><p id="screen-label"></p><div class="progress-track" id="progress-track" aria-hidden="true"></div><p id="clock" class="muted"></p></div>
-<p id="swipe-hint" class="note" hidden></p>
+<div id="caption" role="status" aria-live="polite" aria-atomic="false"><p id="caption-say"></p><p id="caption-heard"></p></div>
 <main id="main" aria-labelledby="step-title" aria-describedby="swipe-hint"></main>
+<p id="swipe-hint" class="note" hidden></p>
 <nav class="guide-controls" aria-label="語音引導"><button type="button" id="replay">重播本段</button><button type="button" id="speech-stop">停止語音</button></nav>
-<details class="machine-progress"><summary>查看機台 12 畫面進度</summary><ol id="screen-list"></ol></details>
-<details id="demo-panel" hidden><summary>Demo controls · 僅供模擬</summary><p>DEMO ONLY：下列控制不會操作或收取真實款項。</p><div id="demo-actions" class="stack"></div></details>
+<details id="dev-panel"><summary id="dev-panel-summary">更多：機台 12 畫面進度</summary>
+<section class="machine-progress"><h3>機台 12 畫面進度</h3><ol id="screen-list"></ol></section>
+<section id="demo-panel" hidden><h3>模擬機台事件（僅供 Demo）</h3><p class="muted">DEMO ONLY：下列控制不會操作或收取真實款項。</p><div id="demo-actions" class="stack"></div></section>
+</details>
 <footer><p id="offline-status">本頁可儲存為單一 HTML，離線開啟。</p><p>Prototype 測試資料 · 未連接學校或實體機台</p></footer>
+</div>
 </div>
 <dialog id="settings" aria-labelledby="settings-title">
   <h2 id="settings-title" tabindex="-1">設定</h2>
@@ -218,12 +251,38 @@ globalThis.TT = globalThis.TT || {};
     liveTimer=setTimeout(()=>{ target.textContent=text; },60);
   };
   const speakLog=[]; // demo 測試掛鉤：每次實際送入 speechSynthesis 的整段文字
-  const speech=new TT.Speech(text=>announce(text),text=>speakLog.push(text));
+  const feedbackLog=[]; // demo 測試掛鉤：每次震動／音效回饋 {type:'vibrate'|'tone', detail, state}
+  let lastFeedbackState='CONNECTED', actx=null;
+  // 字幕列：最新一句 demo 說出的話（silent＝此步驟不朗讀）
+  function setCaption(text,silent=false) { const el=$('caption-say'); el.textContent=text; el.classList.toggle('silent',silent); }
+  const speech=new TT.Speech(text=>announce(text),text=>{ speakLog.push(text); setCaption(text,false); });
+  // ===== 震動＋音效雙重回饋（沿用 vision 的 cueOk／cueWarn 手法；AudioContext 需在使用者手勢後解鎖） =====
+  function unlockAudio() {
+    try { const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return; actx=actx||new AC(); if(actx.state==='suspended') Promise.resolve(actx.resume()).catch(()=>{}); } catch {}
+  }
+  function tone(freq,ms,vol=.08) {
+    if(!actx) return false;
+    try { const o=actx.createOscillator(),g=actx.createGain(); o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime+ms/1000); return true; } catch { return false; }
+  }
+  function feedback(state) {
+    const success=['PAYMENT_SUCCESS','PRINTING','COMPLETED'].includes(state), error=state==='ERROR';
+    const pattern=error?[90,60,90]:success?[120,60,120]:30;
+    let accepted=false;
+    try { accepted=typeof navigator.vibrate==='function' && navigator.vibrate(pattern)===true; } catch {}
+    feedbackLog.push({type:'vibrate',detail:{pattern,accepted},state});
+    if(!success && !error) return;
+    let played;
+    if(error) { played=tone(294,150,.1); setTimeout(()=>tone(294,150,.1),190); }
+    else { played=tone(1319,160,.09); setTimeout(()=>tone(1760,220,.09),170); }
+    feedbackLog.push({type:'tone',detail:{kind:error?'low':'success',played},state});
+  }
+  document.addEventListener('click',unlockAudio,{once:true});
+  document.addEventListener('keydown',unlockAudio,{once:true});
   const usable=text=>!!text && !demo;
   const auth=new TT.DemoAuthAdapter();
   const payment=new TT.PaymentAdapter(status=>dispatch('PAYMENT_STATUS',status));
   const button=(text,event,value='',className='primary')=>`<button type="button" class="${className}" data-event="${event}" data-value="${escape(value)}">${escape(text)}</button>`;
-  const actions=(primary,back=true)=>`<div class="actions">${primary}${back?button('返回上一步','BACK','','secondary'):''}</div>`;
+  const actions=(primary,back=true)=>`<div id="action-bar" class="actions">${primary}${back?button('返回上一步','BACK','','secondary'):''}</div>`;
   const choice=(text,event,value,description='')=>`<button type="button" class="choice" data-event="${event}" data-value="${escape(value)}">${escape(text)}${description?`<small>${escape(description)}</small>`:''}</button>`;
   const heading=(title,body)=>`<h1 id="step-title" tabindex="-1">${title}</h1>${body}`;
   // 只有密碼／身分步驟靜音；REVIEW 金額要覆誦，隱私模式（黑屏）不影響語音
@@ -270,22 +329,22 @@ globalThis.TT = globalThis.TT || {};
     return `<div class="card"><dl><div><dt>申請文件</dt><dd>${escape(session.service.name)}</dd></div>${session.order.rank?`<div><dt>名次類型</dt><dd>${escape(session.order.rank)}</dd></div>`:''}${session.order.semester?`<div><dt>學年期</dt><dd>${escape(session.order.semester)}</dd></div>`:''}<div><dt>份數</dt><dd>${session.order.copies}</dd></div><div><dt>單價</dt><dd>NT$${session.service.price}</dd></div><div class="total"><dt>總金額</dt><dd>NT$${session.total}</dd></div></dl></div>`;
   }
   const pages={
-    CONNECTED:()=>heading('已連接',`<div class="status-icon" aria-hidden="true">✓</div><p class="eyebrow">${escape(machine.organization)}</p><h2>${escape(machine.machineName)}</h2><p class="muted">位置：${escape(machine.location)}</p><p class="note">已載入機台引導。這是互動原型，尚未連接實體設備。</p>${actions(button('開始操作','START'),false)}`),
-    LANGUAGE:()=>heading('選擇語言',`<p class="instruction">本次實測使用中文引導。</p>${guide('LANGUAGE')}${actions(button('中文版 · 繼續','CHOOSE_LANGUAGE'),false)}<p class="muted">英文版尚未提供。</p>`),
+    CONNECTED:()=>heading('NFC 已感應',`<div class="tap-anim" aria-hidden="true"><span>NFC</span></div>${machine.organization?`<p class="eyebrow">${escape(machine.organization)}</p>`:''}<h2>${escape(machine.machineName)}</h2><p class="muted">位置：${escape(machine.location)}</p><p class="note">已載入這台機器的操作引導。互動原型：以開啟連結模擬 NFC 碰觸，尚未連接實體設備。</p>${actions(button('開始操作','START'),false)}`),
+    LANGUAGE:()=>heading('選擇語言',`<p class="instruction">本次實測使用中文引導。</p><p class="muted">英文版尚未提供。</p>${guide('LANGUAGE')}${actions(button('中文版 · 繼續','CHOOSE_LANGUAGE'),false)}`),
     ROLE:()=>heading('選擇你的身分',`<p>請選擇對應身分。</p>${choice('學生／校友','CHOOSE_ROLE','student')}${choice('教職員工','CHOOSE_ROLE','staff','本次原型僅支援學生／校友流程')}${guide('ROLE')}${actions('',true)}`),
-    AUTH:()=>heading('使用測試身分',`<p>Prototype 測試資料。請勿輸入真實個資。</p><p class="note">測試學號：12345678<br>測試生日：20000101（西元年月日）</p><button class="secondary" type="button" id="auth-private">${privateMode?'關閉':'啟用'}隱私模式</button><form id="auth-form" novalidate><label for="student-id">測試學號（8 碼）</label><input id="student-id" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><label for="birthday">測試生日（8 碼）</label><input id="birthday" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><p id="auth-hint" class="muted">僅接受上述測試值。也可直接使用下方 Demo 身分。</p><p id="auth-error" class="error-text"></p><div class="actions"><button class="primary" type="submit">驗證測試資料</button>${button('使用 Demo 身分繼續','DEMO_AUTH','','secondary')}${button('返回上一步','BACK','','secondary')}</div></form>${guide('AUTH')}`),
+    AUTH:()=>heading('使用測試身分',`<p>Prototype 測試資料。請勿輸入真實個資。</p><p class="note">測試學號：12345678<br>測試生日：20000101（西元年月日）</p><button class="secondary" type="button" id="auth-private">${privateMode?'關閉':'啟用'}隱私模式</button><form id="auth-form" novalidate><label for="student-id">測試學號（8 碼）</label><input id="student-id" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><label for="birthday">測試生日（8 碼）</label><input id="birthday" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><p id="auth-hint" class="muted">僅接受上述測試值。也可直接使用下方 Demo 身分。</p><p id="auth-error" class="error-text"></p><div id="action-bar" class="actions"><button class="primary" type="submit">驗證測試資料</button>${button('使用 Demo 身分繼續','DEMO_AUTH','','secondary')}${button('返回上一步','BACK','','secondary')}</div></form>${guide('AUTH')}`),
     VERIFYING:()=>heading('認證處理中',`<div class="pulse" aria-hidden="true"></div><p role="status">正在驗證測試身分，請稍候。</p><p class="muted">這是本機模擬，未傳送資料。</p>`),
     SERVICE:()=>heading('選擇申請文件',`<p>先選文件，下一步選擇份數。</p>${machine.availableServices.map(s=>s.enabled?choice(`${s.name} · NT$${s.price}`,'CHOOSE_SERVICE',s.id,s.description):`<div class="card"><strong>${escape(s.name)} · NT$${s.price}</strong><p class="muted">${escape(s.description)}</p></div>`).join('')}${voiceSection('SERVICE')}${guide('SERVICE')}${actions('',true)}`),
-    COPIES:()=>heading('需要幾份？',`<p>${escape(session.service.name)} · 每份 NT$${session.service.price}</p><form id="copies-form"><fieldset><legend>選擇份數</legend>${Array.from({length:session.service.maxCopies},(_,i)=>`<label class="check"><input type="radio" name="copies" value="${i+1}" ${session.order.copies===i+1?'checked':''}>${i+1} 份</label>`).join('')}</fieldset><p class="total" id="copies-total">總金額 NT$${session.total}</p>${voiceSection('COPIES')}${guide('COPIES')}<div class="actions"><button type="submit" class="primary">確認份數</button>${button('返回上一步','BACK','','secondary')}</div></form>`),
+    COPIES:()=>heading('需要幾份？',`<p>${escape(session.service.name)} · 每份 NT$${session.service.price}</p><form id="copies-form"><fieldset><legend>選擇份數</legend>${Array.from({length:session.service.maxCopies},(_,i)=>`<label class="check"><input type="radio" name="copies" value="${i+1}" ${session.order.copies===i+1?'checked':''}>${i+1} 份</label>`).join('')}</fieldset><p class="total" id="copies-total">總金額 NT$${session.total}</p>${voiceSection('COPIES')}${guide('COPIES')}<div id="action-bar" class="actions"><button type="submit" class="primary">確認份數</button>${button('返回上一步','BACK','','secondary')}</div></form>`),
     RANK:()=>heading('選擇名次類型',`<p>R2 實測選擇「在校各學期系科所名次」。</p>${machine.rankTypes.map(r=>choice(r,'CHOOSE_RANK',r)).join('')}${guide('RANK')}${actions('',true)}`),
     SEMESTER:()=>heading('選擇學年期',`<p>R2 實測使用 114 學年度第 2 學期。</p>${machine.semesters.map(s=>choice(s,'CHOOSE_SEMESTER',s)).join('')}${voiceSection('SEMESTER')}${guide('SEMESTER')}${actions('',true)}`),
     REVIEW:()=>heading('確認申請',`<p>請確認文件、學年期與金額。</p><button type="button" class="secondary" id="review-private">${privateMode?'關閉':'啟用'}隱私模式</button>${summary()}${voiceSection('REVIEW')}${guide('REVIEW')}${actions(button('確認申請','CONFIRM'))}`),
-    PAYMENT_METHOD:()=>heading('先選擇現金',`<p class="total">應付金額 NT$${session.total}</p><div class="card"><p><strong>${escape(machine.physicalActions.cash)}</strong></p><p>${escape(machine.physicalActions.coins)}</p></div>${guide('PAYMENT_METHOD')}${actions(button(demo?'現金 · 開始模擬付款':'已在機台按下現金','CASH'))}<p class="muted">${demo?'此按鈕只模擬付款等待，不會收款。':'請先在實體機台按下現金，再回到手機繼續。'}</p>`),
-    PAYMENT_WAITING:()=>heading('等待機台付款',`<p class="total">應付金額 NT$${session.total}</p><p class="instruction">${demo?'Demo：按下方按鈕模擬機台收款完成（真實情境由機台收款）。':'請在實體機台確認應繳金額與投入金額。這個原型不會自動取得機台付款資訊。'}</p><div class="card"><p>${escape(machine.physicalActions.cash)}</p><p><strong>${escape(machine.physicalActions.coins)}</strong></p></div>${guide('PAYMENT_WAITING')}${actions(demo?button('Demo：模擬機台收款完成','SIM_PAID'):button('已確認機台收款完成','MANUAL_PAID'),false)}<button type="button" class="secondary" id="help">請求協助</button>`),
+    PAYMENT_METHOD:()=>heading('先選擇現金',`<p class="total">應付金額 NT$${session.total}</p><div class="card"><p><strong>${escape(machine.physicalActions.cash)}</strong></p><p>${escape(machine.physicalActions.coins)}</p></div>${guide('PAYMENT_METHOD')}<p class="muted">${demo?'下方按鈕只模擬付款等待，不會收款。':'請先在實體機台按下現金，再回到手機繼續。'}</p>${actions(button(demo?'現金 · 開始模擬付款':'已在機台按下現金','CASH'))}`),
+    PAYMENT_WAITING:()=>heading('等待機台付款',`<p class="total">應付金額 NT$${session.total}</p><p class="instruction">${demo?'Demo：按下方按鈕模擬機台收款完成（真實情境由機台收款）。':'請在實體機台確認應繳金額與投入金額。這個原型不會自動取得機台付款資訊。'}</p><div class="card"><p>${escape(machine.physicalActions.cash)}</p><p><strong>${escape(machine.physicalActions.coins)}</strong></p></div>${guide('PAYMENT_WAITING')}<button type="button" class="secondary" id="help">請求協助</button>${actions(demo?button('Demo：模擬機台收款完成','SIM_PAID'):button('已確認機台收款完成','MANUAL_PAID'),false)}`),
     PAYMENT_SUCCESS:()=>heading('付款成功',`<div class="status-icon" aria-hidden="true">✓</div><p>${demo?'模擬付款已確認。':'已依你的確認記錄收款狀態。'}</p><p>接著處理文件，請稍候。</p>`),
     PROCESSING:()=>heading('文件正在處理',`<div class="pulse" aria-hidden="true"></div><p role="status">正在準備列印文件。</p><p>${demo?'Demo：按下方按鈕模擬機台列印完成（真實情境由機台列印）。':'請等待實體機台顯示列印成功，並確認文件已送出。'}</p>${actions(button(demo?'Demo：模擬機台列印完成':'機台已列印成功','PRINT_READY'),false)}`),
     PRINTING:()=>heading('文件已列印完成',`<div class="status-icon" aria-hidden="true">✓</div><p>${demo?'模擬文件已送至機台列印。':'已依你的確認記錄列印完成。'}</p><p>${escape(session.service.name)}已完成列印。</p><div class="card"><p>${escape(machine.physicalActions.collect)}</p><p>文件取出口在機身最下方；收據出口在機身中段。</p>${session.service.id==='english'||session.service.id==='enrollment-en'?'<p>英文文件領取後，請至櫃台加蓋鋼印。</p>':''}</div>${guide('PRINTING')}${actions(button('已取走文件、收據與找零','COLLECT'),false)}`),
-    COMPLETED:()=>heading('操作完成',`<div class="status-icon" aria-hidden="true">✓</div><p>本次文件申請流程已完成，測試身分與申請資料已清除。</p><p class="note">${escape(machine.physicalActions.collect)}</p>${guide('COMPLETED')}${actions(button('完成操作','RESET')+button('再次申請文件','AGAIN','','secondary'),false)}`),
+    COMPLETED:()=>`<div class="done-hero"><div class="status-icon" aria-hidden="true">✓</div><h1 id="step-title" tabindex="-1">文件已印出</h1><p>操作完成。請再確認一次機身最下方的取出口與中段的收據口，沒有遺留文件、收據或找零。</p></div><p class="muted">本次測試身分與申請資料已清除。</p>${guide('COMPLETED')}${actions(button('完成操作','RESET')+button('再辦一件','AGAIN','','secondary'),false)}`,
     ERROR:()=>{
       const kind=session.error.kind;
       const messages={timeout:['操作時間已到','600 秒已到。目前尚未收到新的機台狀態。請先確認實體機台是否已回到首頁；手機無法延長機台時間。'],payment:['付款未完成','目前無法確認收款結果。若已投入款項，請保留在機台前並請求協助，避免重複投幣。'],unavailable:['機台暫時無法使用','請確認現場機台狀態，或請現場服務人員協助。'],role:['此身分尚未提供','目前原型支援學生／校友流程。請返回選擇。']};
@@ -333,6 +392,7 @@ globalThis.TT = globalThis.TT || {};
   }
   // 按「開始操作」時預設開啟語音（使用者手勢內）；手動關閉過就不再自動開
   function autoEnableSpeech() {
+    unlockAudio();
     if(speech.enabled||ttsManuallyOff) return;
     $('tts').checked=true; speech.enabled=true; speech.unlock();
     $('replay').disabled=false; $('speech-stop').disabled=false;
@@ -352,7 +412,9 @@ globalThis.TT = globalThis.TT || {};
     helpOpen=true;
     const p=document.createElement('p'); p.id='help-message'; p.className='card warning'; p.tabIndex=-1;
     p.textContent='請向身旁陪同者或現場服務人員尋求協助。此按鈕不會傳送求助訊息；若已投幣，請先不要重複付款。';
-    $('main').append(p); p.focus(); announce('請向陪同者或現場服務人員尋求協助。');
+    // 插在按鈕列之前，避免被黏底的 #action-bar 遮住
+    const bar=$('action-bar'); if(bar&&bar.parentElement===$('main')) $('main').insertBefore(p,bar); else $('main').append(p);
+    p.focus(); announce('請向陪同者或現場服務人員尋求協助。');
   }
   function updateProgress() {
     const current=session?.screen||0;
@@ -375,11 +437,11 @@ globalThis.TT = globalThis.TT || {};
     } else {
       $('main').innerHTML=pages[session.state]();
       currentCopy=$('main').querySelector('h1').textContent+'。';
-      if(session.state==='CONNECTED') currentCopy=`已連接${machine.organization}${machine.machineName}。選擇開始操作以繼續。這是本機互動原型。`;
+      if(session.state==='CONNECTED') currentCopy=`NFC 已感應，這是${machine.organization}${machine.machineName}。請按開始操作。這是本機互動原型。`;
       // REVIEW 覆誦申請內容與金額（隱私模式黑屏也照念，只有耳機聽得到）
       if(session.state==='REVIEW') currentCopy+=`${session.service.name}${session.order.rank?'，'+session.order.rank:''}${session.order.semester?'，'+session.order.semester:''}，${session.order.copies} 份，總金額 ${session.total} 元。`;
-      // 狀態變化以震動回饋（裝置不支援時靜默略過）
-      if(['PAYMENT_SUCCESS','PRINTING','COMPLETED','ERROR'].includes(session.state)) try { navigator.vibrate?.(session.state==='ERROR'?[90,60,90]:250); } catch {}
+      // 每進入新步驟：震動；成功／錯誤另加提示音（裝置不支援時靜默略過，仍記入 feedbackLog）
+      if(session.state!==lastFeedbackState) { lastFeedbackState=session.state; feedback(session.state); }
       if(!sensitive()) {
         const g=machine.guidance[session.state]?.[version];
         if(usable(g)) currentCopy+=g;
@@ -388,12 +450,15 @@ globalThis.TT = globalThis.TT || {};
       }
     }
     $('mode-label').textContent=demo?'DEMO · 模擬體驗':'PROTOTYPE · 機台引導';
+    // 字幕列：身分步驟顯示靜音說明，其餘顯示本步驟會朗讀的整段文字；辨識逐字稿隨步驟切換清空
+    setCaption(sensitive()?'此步驟涉及身分資料，Demo 語音不朗讀；請依畫面操作。':currentCopy,sensitive());
+    $('caption-heard').textContent='';
     updateProgress(); renderDemo(); updateSwipeHint();
     $('replay').disabled=!speech.enabled;
     $('speech-stop').disabled=!speech.enabled;
     if(focus && !$('settings').open && !$('reset-dialog').open) $('step-title').focus({preventScroll:true});
-    if(focus) window.scrollTo(0,0);
-    const messages={CONNECTED:'已連接校園文件自動服務機。選擇開始操作以繼續。',COPIES:'已加入文件。請選擇份數。',AUTH:'請使用測試身分。',VERIFYING:'正在驗證測試身分。',REVIEW:'請確認申請內容。',PAYMENT_WAITING:'正在等待付款。',PAYMENT_SUCCESS:'付款成功。',PROCESSING:'文件正在處理。',PRINTING:'文件已列印完成，請取走文件、收據與找零。',COMPLETED:'操作完成。本次資料已清除。'};
+    if(focus) { window.scrollTo(0,0); $('phone-frame').scrollTo(0,0); }
+    const messages={CONNECTED:'NFC 已感應：校園文件自動服務機。選擇開始操作以繼續。',COPIES:'已加入文件。請選擇份數。',AUTH:'請使用測試身分。',VERIFYING:'正在驗證測試身分。',REVIEW:'請確認申請內容。',PAYMENT_WAITING:'正在等待付款。',PAYMENT_SUCCESS:'付款成功。',PROCESSING:'文件正在處理。',PRINTING:'文件已列印完成，請取走文件、收據與找零。',COMPLETED:'文件已印出，操作完成。本次資料已清除。'};
     announce(messages[session?.state]||$('step-title').textContent,session?.state==='ERROR'||!!(machineId&&!machine));
     speech.speak(currentCopy,sensitive());
   }
@@ -411,7 +476,7 @@ globalThis.TT = globalThis.TT || {};
     else if(b.id==='voice-start') startRecognition();
     else if(b.id==='voice-confirm' && voiceCandidate && voiceCandidate.state===session.state) { const c=voiceCandidate; voiceCandidate=null; applyIntent(c.intent,c.state); }
     else if(b.id==='voice-retry') startRecognition();
-    else if(b.id==='voice-cancel') { cancelRecognition(); $('voice-result').textContent=''; $('voice-status').textContent='已停止聆聽。請使用畫面選項繼續。'; $('voice-start').focus(); }
+    else if(b.id==='voice-cancel') { cancelRecognition(); $('voice-result').textContent=''; $('voice-status').textContent='已停止聆聽。請使用畫面選項繼續。'; $('caption-heard').textContent='已停止聆聽。'; $('voice-start').focus(); }
   });
   $('main').addEventListener('submit',e=>{
     e.preventDefault();
@@ -432,6 +497,7 @@ globalThis.TT = globalThis.TT || {};
     const text=error==='not-allowed'?'麥克風權限未開啟。你仍可使用畫面選項完成操作。':'這次沒有成功辨識。請重試，或使用畫面選項完成操作。';
     if($('voice-status')) $('voice-status').textContent=text;
     if($('voice-result')) $('voice-result').innerHTML='';
+    $('caption-heard').textContent=text;
     $('voice-start')?.focus(); announce(text,true);
   }
   // ===== 語音意圖解析（純關鍵字，全瀏覽器端） =====
@@ -536,6 +602,7 @@ globalThis.TT = globalThis.TT || {};
     const rec=new API(); recognition=rec; rec.lang='zh-TW'; rec.interimResults=false; rec.continuous=false;
     $('voice-status').textContent='正在聆聽……語音服務可能使用瀏覽器提供的網路辨識。';
     $('voice-result').innerHTML='<button id="voice-cancel" type="button">停止聆聽</button>';
+    $('caption-heard').textContent=`聆聽中……${v.listen}。`;
     announce(`正在聆聽，${v.listen}。`);
     rec.onresult=async e=>{
       if(token!==voiceToken||session.state!==state) return;
@@ -556,6 +623,7 @@ globalThis.TT = globalThis.TT || {};
       $('voice-result').innerHTML=`<p id="heard"></p>${intent?'<button type="button" id="voice-confirm"></button>':''}<button type="button" id="voice-retry">重新說一次</button>`;
       // 辨識結果只用 textContent，不當 HTML 或指令處理
       $('heard').textContent=intent?`我聽到：${transcript}（解析為：${heard}）`:`我聽到：${transcript}`;
+      $('caption-heard').textContent=$('heard').textContent; // 字幕列同步逐字稿（純文字）
       if(intent) $('voice-confirm').textContent=`確認：${heard}`;
       $(intent?'voice-confirm':'voice-retry').focus();
       const readback=intent?`我聽到${heard}，請確認。`:'沒有找到對應選項，請重新說一次。';
@@ -618,7 +686,15 @@ globalThis.TT = globalThis.TT || {};
   window.addEventListener('pagehide',()=>{ clearTimeout(liveTimer); if(session) clearSession(); document.querySelectorAll('input[type=password]').forEach(i=>i.value=''); });
   window.addEventListener('pageshow',e=>{ if(e.persisted) render(); });
   // 投影模式：stage=1 → 較大文字再放大標題
-  if(params.get('stage')==='1') { document.documentElement.classList.add('large','stage'); $('large').checked=true; }
+  const stage=params.get('stage')==='1';
+  if(stage) { document.documentElement.classList.add('large','stage'); $('large').checked=true; }
+  // 手機外框：stage=1 或視窗 ≥900px 時把畫面包進 .phone-frame（含假狀態列）
+  const wide=matchMedia('(min-width:900px)');
+  const updateFrame=()=>document.documentElement.classList.toggle('framed',stage||wide.matches);
+  updateFrame(); if(wide.addEventListener) wide.addEventListener('change',updateFrame); else wide.addListener(updateFrame);
+  const statusTime=()=>{ $('status-time').textContent=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',hour12:false}); };
+  statusTime(); setInterval(statusTime,30000);
+  $('dev-panel-summary').textContent=demo?'更多：機台 12 畫面進度、模擬機台事件':'更多：機台 12 畫面進度';
   if(demo) {
     // demo 不顯示任何未量測的占位文字
     // 測試掛鉤（僅 demo）
@@ -626,9 +702,11 @@ globalThis.TT = globalThis.TT || {};
       get speechEnabled(){ return speech.enabled; },
       get state(){ return session?.state; },
       get privateMode(){ return privateMode; },
+      get currentCopy(){ return currentCopy; },
       parseIntent,
       dispatch:handleEvent,
-      speakLog
+      speakLog,
+      feedbackLog
     };
   }
   render(false);
