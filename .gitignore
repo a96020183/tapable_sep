@@ -2,3 +2,4 @@ node_modules/
 _qa_photos/
 *.results.json
 tests/**/*.json
+tests/a11y/*.results.json
