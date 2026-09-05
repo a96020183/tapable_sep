@@ -9,7 +9,7 @@
 
 - **Demo 入口頁（一個網址看全部）**：https://a96020183.github.io/taska-voice-demo/start/
 - 評選影片：【交件前補上 YouTube 連結】
-- **機台操作 demo**（手機開）：https://a96020183.github.io/taska-voice-demo/
+- **機台操作 demo**（手機或電腦開，模擬付款模式可走完全流程）：https://a96020183.github.io/taska-voice-demo/?machine=campus-document-kiosk&demo=1
 - **街道導引 demo**（手機開，允許相機）：https://a96020183.github.io/taska-voice-demo/vision/
   —— 用另一台裝置開同網址加 `?marker=1` 當模擬機台
 
