@@ -43,7 +43,7 @@ node tests/intent/parseIntent2.test.js   # 不需伺服器、不需瀏覽器
 
 ```bash
 python -m http.server 4302        # repo 根目錄
-OP_PORT=4302 node tests/op/run-all.js     # op-p0（P0 修補）、op-p1-voice（語音四步驟＋LLM 退回）、op-p2（中斷／stage）＝37 項，加 op-hardening 12 項、op-llm 16 項、op-start 8 項＝73 項
+OP_PORT=4302 node tests/op/run-all.js     # op-p0（P0 修補）、op-p1-voice（語音四步驟＋LLM 退回）、op-p2（中斷／stage）＝37 項，加 op-hardening 12 項、op-llm 23 項、op-start 8 項＝80 項
 OP_PORT=4302 node tests/op/op-r2-ux.js    # 第二輪 UX 契約 29 項（字幕列、雙重回饋、外框、開發者面板、開場、完成頁、按鈕列）
 OP_PORT=4302 node tests/op/op-hardening.js # 對抗測試修補回歸 12 項（雙擊連跳冷卻、聆聽中止 UI、語音關閉持久化、隱私鈕同步、空 results、無辨識 API、長逐字稿截斷）
 OP_PORT=4302 node tests/op/op-llm.js     # 預設雲端意圖解析 16 項（呼叫代理、故障／離線退回規則式、越界回傳擋下、可關閉、身分步驟不送出）
