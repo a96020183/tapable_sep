@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#05080d">
+<meta name="description" content="TapThrough Vision — 端側即時環境辨識與語音導引原型（輔助導引，非自動導盲）。影像僅於裝置端即時處理，不儲存、不上傳。">
+<title>TapThrough Vision · 環境導引</title>
+<style>
+:root{color-scheme:dark;--bg:#05080d;--panel:#101823;--line:#3d4c60;--fg:#f2f6fb;--muted:#aab8c9;--accent:#8fe3cf;--warn:#ffb4a2;font-family:system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-size:17px;line-height:1.55;padding-bottom:env(safe-area-inset-bottom)}
+header{padding:10px 14px 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h1{font-size:1.05rem;margin:0;letter-spacing:.02em}
+#diag{font-size:.72rem;color:var(--muted)}
+#stage{position:relative;margin:0 10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000;aspect-ratio:4/3}
+#view{width:100%;height:100%;display:block;object-fit:cover}
+#live{margin:10px 14px 4px;min-height:3.2em;font-size:1.25rem;font-weight:600}
+#intent{margin:0 14px;font-size:.78rem;color:var(--accent);font-family:ui-monospace,Consolas,monospace;min-height:1.2em;word-break:break-all}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 14px}
+button{font:inherit;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:52px;flex:1 1 40%}
+button.primary{background:#173b31;border-color:var(--accent);color:var(--accent);font-weight:700}
+button.active{background:#2a3b52;border-color:#9ec5ff}
+button:disabled{opacity:.45}
+#settings{margin:4px 14px;color:var(--muted);font-size:.9rem}
+#settings label{display:flex;align-items:center;gap:8px;margin:6px 0}
+input[type=range]{flex:1}
+footer{margin:14px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--line);padding-top:8px}
+body.blackout #stage,body.blackout #settings,body.blackout footer,body.blackout header{display:none}
+body.blackout{background:#000}
+body.blackout #live{font-size:1.6rem;padding-top:30vh;text-align:center}
+#arrive{display:none;margin:10px 14px;padding:14px;border:1px solid var(--accent);border-radius:12px;color:var(--accent);font-weight:700;font-size:1.2rem;text-align:center}
+/* 模擬機台標記頁 */
+body.marker{background:#fff;color:#111;text-align:center}
+body.marker .wrap{padding:24px 12px}
+body.marker h2{font-size:1.4rem;margin:8px 0}
+body.marker #qr img{width:min(70vw,70vh);height:auto;image-rendering:pixelated}
+body.marker .pad{margin-top:14px;display:inline-block;border:3px dashed #888;border-radius:16px;padding:18px 26px;font-size:1.1rem;color:#444}
+</style>
+</head>
+<body>
+<header><h1>TapThrough Vision</h1><span id="diag" aria-hidden="true">初始化…</span></header>
+<div id="stage"><canvas id="view" width="480" height="360"></canvas></div>
+<p id="live" role="status" aria-live="assertive">按「開始導引」啟動鏡頭與語音。</p>
+<p id="intent"></p>
+<div id="arrive">✓ 已抵達目標機台</div>
+<div class="row">
+  <button id="start" class="primary">▶ 開始導引</button>
+  <button id="target" disabled>🎯 尋找機台</button>
+</div>
+<div class="row">
+  <button id="ask" disabled>附近有什麼？</button>
+  <button id="mic" disabled>🎤 語音指令</button>
+</div>
+<div id="settings">
+  <label><input type="checkbox" id="blackout">黑屏模式（防窺，語音照常）</label>
+  <label>語速 <input type="range" id="rate" min="0.8" max="1.5" step="0.1" value="1.05"></label>
+</div>
+<footer>
+輔助導引原型，非自動導盲系統——請持續使用白手杖或導盲犬。影像僅於<b>裝置端</b>即時推論後即刻丟棄：不儲存、不上傳、無任何網路傳輸。物件辨識為端側模型（SSDLite-MobileNetV2）；「螢幕→機台」為 demo 映射，機台確認以視覺標記為準。模擬機台標記頁：本網址加 <code>?marker=1</code>。
+</footer>
+
+<script src="./lib/tf.min.js"></script>
+<script src="./lib/coco-ssd.min.js"></script>
+<script src="./lib/jsQR.js"></script>
+<script src="./lib/qrcode.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const P=new URLSearchParams(location.search);
+
+/* ---------- 模擬機台標記頁 ---------- */
+if(P.get('marker')){
+  document.body.className='marker';
+  document.body.innerHTML='<div class="wrap"><h2>模擬機台（示意）</h2><div id="qr"></div><br><div class="pad">📶 感應區（示意）</div><p>把這個畫面全螢幕放在筆電／平板上，<br>它就是 demo 裡的「目標機台」。</p></div>';
+  const q=qrcode(0,'M'); q.addData('TAPTHROUGH-KIOSK-01'); q.make();
+  document.getElementById('qr').innerHTML=q.createImgTag(10,8);
+  document.title='模擬機台標記';
+}else{
+
+/* ---------- 主程式 ---------- */
+const NOSPEECH=P.get('nospeech')==='1', AUTOSTART=P.get('autostart')==='1';
+const view=$('view'),ctx=view.getContext('2d',{willReadFrequently:true});
+const live=$('live');
+const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',bus:'公車',truck:'卡車','traffic light':'紅綠燈','stop sign':'停車標誌','fire hydrant':'消防栓',bench:'長椅',chair:'椅子',dog:'狗',backpack:'背包',umbrella:'雨傘',suitcase:'行李箱','potted plant':'盆栽',tv:'螢幕',laptop:'筆電螢幕','cell phone':'手機'};
+const VEHICLE=new Set(['car','bus','truck','motorcycle','bicycle']);
+const SCREEN=new Set(['tv','laptop']);
+const TIERS=[[0.30,'很近'],[0.11,'近'],[0.035,'中距離'],[0,'遠']];
+const tierOf=a=>TIERS.findIndex(t=>a>=t[0]);
+const tierName=i=>TIERS[i][1];
+const dirOf=cx=>cx<0.35?0:cx<=0.65?1:2;
+const DIR=['左前方','正前方','右前方'], CLOCK=['十點鐘方向','十二點鐘方向','兩點鐘方向'];
+
+let model=null,video=null,running=false,frames=0,errors=0,lastDets=[],lastQR=null;
+let targetMode=false,arrived=false,lastGuide={dir:-1,tier:99,t:0},lastHint=0,lastSearchNote=0;
+const tracks=new Map(); // cls -> {seen,area,dir,tier,spoken}
+window.__V={get ready(){return !!model},get frames(){return frames},get errors(){return errors},get dets(){return lastDets}};
+
+/* ---------- 語音（P0 打斷，冷卻由事件層管） ---------- */
+const synth=window.speechSynthesis;
+let zhVoice=null;
+function pickVoice(){const vs=synth?synth.getVoices():[];zhVoice=vs.find(v=>/zh[-_](TW|Hant)/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
+function utter(text){const u=new SpeechSynthesisUtterance(text);u.lang='zh-TW';if(zhVoice)u.voice=zhVoice;u.rate=parseFloat($('rate').value);synth.speak(u)}
+function speak(text,p0){
+  live.textContent=text;
+  if(NOSPEECH||!synth)return;
+  if(p0){synth.cancel();setTimeout(function(){utter(text)},90)} // iOS：cancel 後要隔一拍再 speak
+  else if(!synth.speaking&&!synth.pending)utter(text);
+}
+
+/* ---------- 事件引擎：新事件才出聲，沒變化保持靜默 ---------- */
+const COOL={vehicle:5000,person:4500,screen:9000,guide:3500,search:12000};
+function geom(d){const b=d.bbox;return[(b[2]*b[3])/(view.width*view.height),(b[0]+b[2]/2)/view.width]}
+function evaluate(dets,now){
+  for(const d of dets){
+    const cls=d.class; if(!(cls in ZH))continue;
+    const g=geom(d),a=g[0],cx=g[1];
+    const dir=dirOf(cx),tier=tierOf(a);
+    const t=tracks.get(cls)||{seen:0,area:a,dir:dir,tier:tier,spoken:0};
+    const fresh=now-t.seen>3000;
+    if(VEHICLE.has(cls)&&tier<=1&&(fresh||dir!==t.dir||now-t.spoken>COOL.vehicle)){
+      speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
+    }
+    else if(cls==='person'&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
+      speak('注意，前方有人靠近。',true);t.spoken=now;
+    }
+    else if(cls==='person'&&fresh&&tier===0&&now-t.spoken>COOL.person){
+      speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
+    }
+    t.seen=now;t.area=a;t.dir=dir;t.tier=tier;tracks.set(cls,t);
+  }
+  if(targetMode&&!arrived)guideTarget(dets,now);
+}
+
+/* ---------- 目標導引（機台） ---------- */
+function guideTarget(dets,now){
+  const qr=(lastQR&&now-lastQR.t<1600)?lastQR:null;
+  if(qr){
+    const dir=dirOf(qr.cx),tier=tierOf(qr.area);
+    if(qr.area>=0.16){
+      arrived=true;$('arrive').style.display='block';
+      speak('已抵達目標機台。請將手機靠近感應區。',true);
+      setIntent('{"event":"arrived","target":"kiosk"}');return;
+    }
+    if(dir!==lastGuide.dir||tier<lastGuide.tier||now-lastGuide.t>COOL.guide){
+      speak('機台在'+CLOCK[dir]+'，'+tierName(tier)+'。',false);
+      lastGuide={dir:dir,tier:tier,t:now};
+    }
+    return;
+  }
+  const sc=dets.find(function(d){return SCREEN.has(d.class)});
+  if(sc){
+    if(now-lastHint>COOL.screen){
+      const cx=geom(sc)[1];
+      speak(DIR[dirOf(cx)]+'發現螢幕裝置，可能是目標機台，靠近後確認標記。',false);
+      lastHint=now;
+    }
+  }else if(now-lastSearchNote>COOL.search){
+    speak('持續尋找機台中，請緩慢左右移動鏡頭。',false);lastSearchNote=now;
+  }
+}
+function setIntent(s){$('intent').textContent=s}
+
+/* ---------- P2：只在使用者詢問時描述環境 ---------- */
+function describe(){
+  const parts=lastDets.filter(function(d){return d.class in ZH}).slice(0,4)
+    .map(function(d){const g=geom(d);return DIR[dirOf(g[1])]+'有'+ZH[d.class]+'，'+tierName(tierOf(g[0]))});
+  speak(parts.length?'目前看到：'+parts.join('；')+'。':'目前沒有辨識到明顯物體。',true);
+}
+
+/* ---------- 語音指令（瀏覽器有支援才啟用；iOS 建議用按鈕） ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+function listen(){
+  if(!SR)return;
+  const r=new SR();r.lang='zh-TW';r.interimResults=false;
+  speak('請說指令。',true);
+  r.onresult=function(e){
+    const s=e.results[0][0].transcript;
+    if(/找|機台|繳費|列印|印/.test(s)){setTarget(true);setIntent('{"intent":"find_target","target":"kiosk","utterance":"'+s.replace(/"/g,'')+'"}')}
+    else if(/附近|什麼|周圍/.test(s))describe();
+    else speak('沒聽懂，可以說：幫我找機台。',true);
+  };
+  r.onerror=function(){speak('語音輸入失敗，請改用按鈕。',true)};
+  r.start();
+}
+function setTarget(on){
+  targetMode=on;arrived=false;$('arrive').style.display='none';
+  $('target').classList.toggle('active',on);
+  $('target').textContent=on?'🎯 尋找中…（點擊停止）':'🎯 尋找機台';
+  lastGuide={dir:-1,tier:99,t:0};lastSearchNote=Date.now();
+  if(on){speak('開始尋找機台。',true);setIntent('{"intent":"find_target","target":"kiosk"}')}
+  else{speak('已停止尋找。',true);setIntent('')}
+}
+
+/* ---------- 主迴圈：30FPS 取流、約 4–6FPS 推論、同幀掃標記 ---------- */
+function loop(){
+  if(!running)return;
+  const t0=performance.now();
+  ctx.drawImage(video,0,0,view.width,view.height);
+  let img=null,scanned=false;
+  try{img=ctx.getImageData(0,0,view.width,view.height)}catch(e){errors++}
+  if(img){
+    const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
+    if(code&&/TAPTHROUGH/i.test(code.data)){
+      const L=code.location;
+      const xs=[L.topLeftCorner.x,L.topRightCorner.x,L.bottomLeftCorner.x,L.bottomRightCorner.x];
+      const ys=[L.topLeftCorner.y,L.topRightCorner.y,L.bottomLeftCorner.y,L.bottomRightCorner.y];
+      const minx=Math.min.apply(null,xs),maxx=Math.max.apply(null,xs);
+      const miny=Math.min.apply(null,ys),maxy=Math.max.apply(null,ys);
+      const w=maxx-minx,h=maxy-miny;
+      // 標記只佔機台一角：面積乘 6 近似機台本體大小
+      lastQR={t:Date.now(),area:Math.min(1,(w*h*6)/(view.width*view.height)),cx:(minx+maxx)/2/view.width,box:[minx,miny,w,h]};
+      scanned=true;
+    }
+  }
+  model.detect(view,8,0.55).then(function(dets){
+    if(scanned&&lastQR)lastQR.t=Date.now(); // 推論耗時不可預期，時效以本 tick 完成時間為準
+    lastDets=dets;frames++;
+    evaluate(dets,Date.now());
+    draw(dets);
+    $('diag').textContent=(model?'模型✓ ':'')+frames+'幀'+(errors?' '+errors+'錯誤':'');
+    setTimeout(loop,Math.max(40,200-(performance.now()-t0)));
+  }).catch(function(){errors++;setTimeout(loop,400)});
+}
+function draw(dets){
+  ctx.lineWidth=3;ctx.font='15px system-ui';
+  for(const d of dets){
+    if(!(d.class in ZH))continue;
+    const x=d.bbox[0],y=d.bbox[1],w=d.bbox[2],h=d.bbox[3];
+    const p0=VEHICLE.has(d.class)||d.class==='person';
+    const isScr=SCREEN.has(d.class);
+    ctx.strokeStyle=isScr&&targetMode?'#7fd7ff':(p0?'#ff8f7a':'#8fe3cf');
+    ctx.strokeRect(x,y,w,h);
+    const label=ZH[d.class]+(isScr?'（映射:機台候選）':'')+' '+Math.round(d.score*100)+'%';
+    ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(x,Math.max(0,y-20),ctx.measureText(label).width+10,20);
+    ctx.fillStyle='#fff';ctx.fillText(label,x+5,Math.max(14,y-5));
+  }
+  if(lastQR&&Date.now()-lastQR.t<1600){
+    const b=lastQR.box;ctx.strokeStyle='#ffd166';ctx.strokeRect(b[0],b[1],b[2],b[3]);
+    ctx.fillStyle='#ffd166';ctx.fillText('機台標記',b[0],Math.max(14,b[1]-6));
+  }
+}
+
+/* ---------- 啟動／停止 ---------- */
+function start(){
+  $('start').disabled=true;$('start').textContent='載入中…';
+  live.textContent='正在載入端側模型（首次約 18MB，之後有快取）…';
+  const mp=cocoSsd.load({modelUrl:'./model/model.json'});
+  navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}})
+  .then(function(stream){
+    video=document.createElement('video');video.playsInline=true;video.setAttribute('playsinline','');video.muted=true;video.srcObject=stream;
+    return video.play();
+  })
+  .then(function(){return mp})
+  .then(function(m){
+    model=m;running=true;
+    $('target').disabled=$('ask').disabled=false;
+    if(SR)$('mic').disabled=false;else $('mic').textContent='🎤（此瀏覽器不支援）';
+    $('start').textContent='⏹ 停止';$('start').disabled=false;$('start').onclick=stop;
+    speak('環境辨識已開啟。',true);
+    loop();
+  })
+  .catch(function(e){
+    errors++;$('start').disabled=false;$('start').textContent='▶ 開始導引';
+    live.textContent='啟動失敗：'+((e&&e.name==='NotAllowedError')?'請允許相機權限。':(e&&e.message||e));
+  });
+}
+function stop(){
+  running=false;
+  if(video&&video.srcObject)video.srcObject.getTracks().forEach(function(t){t.stop()});
+  if(synth)synth.cancel();
+  $('start').textContent='▶ 開始導引';$('start').onclick=start;
+  $('target').disabled=$('ask').disabled=$('mic').disabled=true;
+  setTarget(false);live.textContent='已停止。';
+}
+$('start').onclick=start;
+$('target').onclick=function(){setTarget(!targetMode)};
+$('ask').onclick=describe;
+$('mic').onclick=listen;
+$('blackout').onchange=function(e){document.body.classList.toggle('blackout',e.target.checked)};
+window.addEventListener('error',function(){errors++});
+if(AUTOSTART)start();
+}
+</script>
+</body>
+</html>
