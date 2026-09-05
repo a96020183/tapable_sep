@@ -1,5 +1,7 @@
 # 測試
 
+最近一次完整執行的結果（含日期與環境）記在 [RESULTS.md](RESULTS.md)。
+
 ## 無障礙自動檢測（axe-core，WCAG 2.1 A/AA）
 
 ```bash

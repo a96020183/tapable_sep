@@ -24,7 +24,7 @@
 | **問題定義與影響力 35%** | 視障語音 ATM 八年從 808 據點做到 7,881 台（金管會 2025/10/02 新聞稿）——監理有效但逐台派工、仍不足四分之一，且這條慢車道只存在於金融場域；逾 1/3 語音機因物理耗損失效（身心障礙聯盟）；五個操作斷點對照；三位視障者訪談（滿意度 4.67/5）與「想去領錢就去領錢」；電梯口到印出文件的實測情境；銀行／醫院付費、視障者永久免費的商業模式與合規動機 | 「為什麼做這個」「為什麼是手機」「五個實際斷點」「實測情境」「商業模式」「參考來源」|
 | **技術實作 30%** | 端側電腦視覺三層（COCO 偵測 → 機台外觀 kNN 比對 → 視覺標記確認）、事件引擎（優先序、逼近偵測、多人去重）；語音輸入四步驟＋覆誦確認；**規則式＋大型語言模型雙層意圖解析**（預設走自架代理，斷網自動退回裝置端規則式，三道白名單驗證）；Service Worker 離線（18MB 模型預快取）；黑屏防窺＋雙重回饋；Playwright 回歸 80＋29 項、意圖解析單元 85 項（直接測 index.html 內出貨的解析器）、vision 五支 31 項；**axe-core WCAG 2.1 A/AA 18 個畫面 0 違規**、純鍵盤操作 6 項 | `index.html`、`vision/`、`server/vercel`、`tests/`、「這裡面什麼是真的」|
 | **成果展示 20%** | 一個入口頁看全部（含 60 秒語音導覽與逐字稿）；60 秒試玩導引；手機與投影兩張截圖；`?stage=1` 手機外框投影模式；入口頁 60 秒語音導覽（附逐字稿）| `start/`、本頁上方 |
-| **開源品質 15%** | MIT；第三方授權全文與 NOTICE；`tests/README` 一行指令可重現（含無障礙自動檢測 `tests/a11y/`）；`tools/build-kiosk-refs.js` 產生流程；`docs/kiosk-flow.md`（去識別實地流程）、`docs/field-test-protocol.md`（實測方法與限制）；未實作項目逐條誠實標示 | `LICENSE`、`THIRD_PARTY_LICENSES.md`、`tests/`、`tools/`、`docs/` |
+| **開源品質 15%** | MIT；第三方授權全文與 NOTICE；`tests/README` 一行指令可重現（含無障礙自動檢測 `tests/a11y/`）；[`tests/RESULTS.md`](tests/RESULTS.md) 附帶日期的完整執行紀錄，不跑測試也看得到證據；`tools/build-kiosk-refs.js` 產生流程；`docs/kiosk-flow.md`（去識別實地流程）、`docs/field-test-protocol.md`（實測方法與限制）；未實作項目逐條誠實標示 | `LICENSE`、`THIRD_PARTY_LICENSES.md`、`tests/`、`tools/`、`docs/` |
 
 ## 🎬 兩分鐘看懂
 
