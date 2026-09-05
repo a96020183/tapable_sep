@@ -7,6 +7,7 @@
 
 ## 🎬 兩分鐘看懂
 
+- **Demo 入口頁（一個網址看全部）**：https://a96020183.github.io/taska-voice-demo/start/
 - 評選影片：【交件前補上 YouTube 連結】
 - **機台操作 demo**（手機開）：https://a96020183.github.io/taska-voice-demo/
 - **街道導引 demo**（手機開，允許相機）：https://a96020183.github.io/taska-voice-demo/vision/
