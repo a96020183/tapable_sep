@@ -34,6 +34,9 @@ body.blackout .row button{background:#0a0d10;color:#5a646f;border-color:#20262d}
 #exitBlack{display:none}
 body.blackout #exitBlack{display:block;position:fixed;bottom:12px;left:12px;right:12px;background:#0a0d10;color:#6b7681;border:1px solid #20262d;border-radius:12px;padding:14px;font-size:1rem}
 #arrive{display:none;margin:10px 14px;padding:14px;border:1px solid var(--accent);border-radius:12px;color:var(--accent);font-weight:700;font-size:1.2rem;text-align:center}
+#arrive button{margin-top:12px;width:100%;background:#173b31;border:1px solid var(--accent);color:var(--accent);border-radius:12px;padding:14px;font:inherit;font-weight:700;min-height:52px}
+body.stage #live{font-size:1.7rem;min-height:2.6em}
+body.stage #intent{font-size:.95rem}
 /* 模擬機台標記頁 */
 body.marker{background:#fff;color:#111;text-align:center}
 body.marker .wrap{padding:24px 12px}
@@ -62,7 +65,7 @@ body.marker .pad{margin-top:14px;display:inline-block;border:3px dashed #888;bor
   <label>語速 <input type="range" id="rate" min="0.8" max="1.5" step="0.1" value="1.05"></label>
 </div>
 <footer>
-輔助導引原型，非自動導盲系統——請持續使用白手杖或導盲犬。影像僅於<b>裝置端</b>即時推論後即刻丟棄：不儲存、不上傳、無任何網路傳輸。物件辨識為端側模型（SSDLite-MobileNetV2）；機台外觀比對使用實地照片的特徵向量（照片本體不隨頁面提供），最終確認以視覺標記為準；「螢幕→機台」為 demo 映射。模擬機台標記頁：本網址加 <code>?marker=1</code>。
+輔助導引原型，非自動導盲系統——請持續使用白手杖或導盲犬。影像僅於<b>裝置端</b>即時推論後即刻丟棄：不儲存、不上傳、無任何網路傳輸。物件辨識為端側模型（SSDLite-MobileNetV2）；機台外觀比對使用實地照片的特徵向量（照片本體不隨頁面提供），最終確認以視覺標記為準；「螢幕→機台」為 demo 映射。模擬機台標記頁：本網址加 <code>?marker=1</code>；展示模式（字幕放大）加 <code>?stage=1</code>。點一下預覽或字幕可立即中斷目前語音。
 </footer>
 
 <script src="./lib/tf.min.js"></script>
@@ -85,6 +88,15 @@ if(P.get('marker')){
 
 /* ---------- 主程式 ---------- */
 const NOSPEECH=P.get('nospeech')==='1', AUTOSTART=P.get('autostart')==='1';
+if(P.get('stage')==='1')document.body.classList.add('stage'); // 展示模式：字幕放大，投影給評審看
+
+/* ---------- 雙重反饋（訪談產出：成功=長震動+清脆音；警告=短震動x2+低沉音）＋防睡眠 ---------- */
+let actx=null,wlock=null;
+function unlockAudio(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){}}
+function tone(f,ms,vol){if(!actx)return;try{const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=f;g.gain.value=vol||.08;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+ms/1000)}catch(e){}}
+function cueWarn(){tone(294,150,.1);setTimeout(function(){tone(294,150,.1)},190);if(navigator.vibrate)navigator.vibrate([90,60,90])}
+function cueOk(){tone(1319,160,.09);setTimeout(function(){tone(1760,220,.09)},170);if(navigator.vibrate)navigator.vibrate(250)}
+function keepAwake(){if(navigator.wakeLock&&navigator.wakeLock.request)navigator.wakeLock.request('screen').then(function(l){wlock=l}).catch(function(){})}
 const view=$('view'),ctx=view.getContext('2d',{willReadFrequently:true});
 const live=$('live');
 const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',airplane:'飛機',truck:'卡車',boat:'船','traffic light':'紅綠燈','fire hydrant':'消防栓','stop sign':'停車標誌','parking meter':'停車收費表',bench:'長椅',bird:'鳥',cat:'貓',dog:'狗',horse:'馬',sheep:'羊',cow:'牛',elephant:'大象',bear:'熊',zebra:'斑馬',giraffe:'長頸鹿',backpack:'背包',umbrella:'雨傘',handbag:'手提包',tie:'領帶',suitcase:'行李箱',frisbee:'飛盤',skis:'滑雪板',snowboard:'滑雪板','sports ball':'球',kite:'風箏','baseball bat':'球棒','baseball glove':'棒球手套',skateboard:'滑板',surfboard:'衝浪板','tennis racket':'球拍',bottle:'瓶子','wine glass':'玻璃杯',cup:'杯子',fork:'叉子',knife:'刀',spoon:'湯匙',bowl:'碗',banana:'香蕉',apple:'蘋果',sandwich:'三明治',orange:'柳橙',broccoli:'花椰菜',carrot:'紅蘿蔔','hot dog':'熱狗',pizza:'披薩',donut:'甜甜圈',cake:'蛋糕',chair:'椅子',couch:'沙發','potted plant':'盆栽',bed:'床','dining table':'桌子',toilet:'馬桶',tv:'螢幕',laptop:'筆電螢幕',mouse:'滑鼠',remote:'遙控器',keyboard:'鍵盤','cell phone':'手機',microwave:'微波爐',oven:'烤箱',toaster:'烤麵包機',sink:'洗手台',refrigerator:'冰箱',book:'書',clock:'時鐘',vase:'花瓶',scissors:'剪刀','teddy bear':'玩偶','hair drier':'吹風機',toothbrush:'牙刷'};
@@ -160,13 +172,13 @@ function evaluate(dets,now){
     t.hits=fresh?1:t.hits+1;
     const solid=d.score>=P0_SCORE&&t.hits>=P0_HITS; // 夠有把握才准開口
     if(VEHICLE.has(cls)&&solid&&tier<=1&&(t.spoken===0||dir!==t.dir||now-t.spoken>COOL.vehicle)){
-      speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
+      cueWarn();speak('注意，'+DIR[dir]+'有'+ZH[cls]+'，'+tierName(tier)+'。',true);t.spoken=now;
     }
     else if(cls==='person'&&solid&&!fresh&&a>t.area*1.6&&tier<=1&&now-t.spoken>COOL.person){
-      speak('注意，前方有人靠近。',true);t.spoken=now;
+      cueWarn();speak('注意，前方有人靠近。',true);t.spoken=now;
     }
     else if(cls==='person'&&solid&&tier===0&&t.tier!==0&&now-t.spoken>COOL.person){ // 進入很近那一刻才報，站著不動不重複
-      speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
+      cueWarn();speak('注意，'+DIR[dir]+'有行人，很近。',true);t.spoken=now;
     }
     t.seen=now;t.area=a;t.dir=dir;t.tier=tier;tracks.set(cls,t);
   }
@@ -182,7 +194,10 @@ function guideTarget(dets,now){
   if(qr){
     const dir=dirOf(qr.cx),tier=tierOf(qr.area);
     if(qr.area>=0.16){
-      arrived=true;$('arrive').style.display='block';
+      arrived=true;cueOk();
+      const ar=$('arrive');ar.style.display='block';
+      ar.innerHTML='✓ 已抵達目標機台<br><button id="handoff" type="button">📳 碰觸貼紙 → 交棒操作段（demo 以按鈕模擬）</button>';
+      $('handoff').onclick=function(){location.href='../'};
       speak('已抵達目標機台。請將手機靠近感應區。',true);
       setIntent('{"event":"arrived","target":"kiosk"}');return;
     }
@@ -309,6 +324,7 @@ function draw(dets){
 
 /* ---------- 啟動／停止 ---------- */
 function start(){
+  unlockAudio(); // 必須在使用者手勢裡解鎖，音效反饋才出得來（iOS）
   $('start').disabled=true;$('start').textContent='載入中…';
   live.textContent='正在載入端側模型（首次約 18MB，之後有快取）…';
   const mp=cocoSsd.load({modelUrl:'./model/model.json'});
@@ -319,7 +335,7 @@ function start(){
   })
   .then(function(){return mp})
   .then(function(m){
-    model=m;running=true;
+    model=m;running=true;keepAwake();
     $('target').disabled=$('ask').disabled=false;
     if(SR)$('mic').disabled=false;else $('mic').textContent='🎤（此瀏覽器不支援）';
     $('start').textContent='⏹ 停止';$('start').disabled=false;$('start').onclick=stop;
@@ -331,8 +347,19 @@ function start(){
     live.textContent='啟動失敗：'+((e&&e.name==='NotAllowedError')?'請允許相機權限。':(e&&e.message||e));
   });
 }
+function recoverCam(){ // 切 app／螢幕鎖回來後，相機軌道常已死，靜靜自救
+  if(!running||!video)return;
+  const tr=video.srcObject&&video.srcObject.getVideoTracks()[0];
+  if(tr&&tr.readyState==='live'){video.play().catch(function(){});return}
+  navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}})
+  .then(function(s){video.srcObject=s;return video.play()}).catch(function(){errors++});
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'&&running){keepAwake();recoverCam()}
+});
 function stop(){
   running=false;
+  if(wlock){wlock.release().catch(function(){});wlock=null}
   if(video&&video.srcObject)video.srcObject.getTracks().forEach(function(t){t.stop()});
   if(synth)synth.cancel();
   $('start').textContent='▶ 開始導引';$('start').onclick=start;
@@ -343,6 +370,9 @@ $('start').onclick=start;
 $('target').onclick=function(){setTarget(!targetMode)};
 $('ask').onclick=describe;
 $('mic').onclick=listen;
+/* 訪談要求「可中斷性」：點預覽或字幕＝立刻略過目前這句 */
+function hush(){if(synth&&(synth.speaking||synth.pending)){synth.cancel();live.textContent+='　⏭'}}
+$('stage').onclick=hush;live.onclick=hush;
 function setBlackout(on){
   document.body.classList.toggle('blackout',on);
   $('blackout').checked=on;
