@@ -4,17 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090e15">
-<meta name="description" content="TapThrough 校園文件機手機無障礙互動原型。">
-<title>TapThrough · 校園文件機</title>
+<meta name="description" content="TapAble 校園文件機手機無障礙互動原型。">
+<title>TapAble · 校園文件機</title>
 <style>:root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif;font-size:18px;background:#090e15;color:#f4f7fc;--bg:#090e15;--panel:#141d29;--line:#52647b;--muted:#b6c3d5;--accent:#9be9d2;--ink:#09261e;line-height:1.6}
 *{box-sizing:border-box}body{margin:0 auto;max-width:640px;padding:0 22px 26px;overflow-wrap:anywhere}button,input,select{font:inherit}button,summary,input,select{touch-action:manipulation}button{min-height:52px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:inherit;padding:12px 18px;cursor:pointer;text-align:center;line-height:1.45}button:hover{border-color:var(--accent)}button:disabled{opacity:.6;cursor:not-allowed}button.primary{background:var(--accent);color:var(--ink);border-color:var(--accent);font-weight:750;width:100%;min-height:62px}button.secondary{width:100%}button.choice{display:block;width:100%;text-align:left;margin:10px 0;padding:18px}button.choice small{display:block;color:var(--muted);font-size:.85rem;margin-top:5px}h1{font-size:clamp(1.8rem,6.8vw,2.4rem);line-height:1.25;letter-spacing:-.035em;margin:14px 0 20px}h2{line-height:1.3}p{margin:10px 0 20px}a{color:var(--accent)}:focus-visible,h1:focus,h2:focus{outline:3px solid #ffdf8a;outline-offset:5px}h1:focus,h2:focus{border-radius:3px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:24px 0 18px}.brand{font-size:1.18rem;font-weight:800;letter-spacing:-.04em}.brand-dot{color:var(--accent);font-size:.58rem;vertical-align:super;margin-left:5px}.top button{font-size:.85rem;min-height:48px;padding:8px 15px}.mode-label{font-size:.8rem;color:var(--accent);letter-spacing:.03em;margin:0 0 18px}.muted,footer{color:var(--muted)}.journey{border-top:1px solid var(--line);padding-top:15px}.journey p{font-size:.85rem;margin:0 0 9px}.progress-track{display:flex;gap:4px;margin:14px 0}.progress-track i{height:4px;flex:1;border-radius:9px;background:#344257}.progress-track i.done{background:var(--accent)}#clock{font-size:.8rem}main{padding:12px 0 8px;min-height:320px}.eyebrow{color:var(--accent);font-size:.9rem}.instruction{font-size:1.05rem}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;margin:20px 0}.card p:last-child{margin-bottom:0}.note{border-left:3px solid var(--accent);padding:0 0 0 16px;color:var(--muted)}.warning{border-color:#ffdf8a;color:#ffdf8a}.actions{display:grid;gap:12px;margin:28px 0 8px}.guide-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.guide-controls button{font-size:.9rem}details{border-top:1px solid var(--line);padding:15px 0}summary{cursor:pointer;min-height:48px;padding:10px 0;font-size:.9rem}li{margin-bottom:10px}li[aria-current=step]{color:var(--accent);font-weight:700}footer{font-size:.78rem;padding:12px 0}footer p{margin-bottom:8px}label{display:block;margin:14px 0 6px}input:not([type=checkbox]):not([type=radio]):not([type=range]),select{width:100%;min-width:0;background:var(--bg);color:inherit;border:1px solid var(--line);border-radius:12px;padding:13px;min-height:52px}input[type=range]{width:100%;min-height:48px}input[type=checkbox],input[type=radio]{width:24px;height:24px;flex:0 0 24px;accent-color:var(--accent)}.check{display:flex;gap:12px;align-items:center;min-height:52px}.check:has(input:checked){color:var(--accent)}fieldset{min-width:0;border:1px solid var(--line);border-radius:14px;margin:20px 0;padding:12px}legend{padding:0 6px}.stack{display:grid;gap:10px}dl{margin:0}dl div{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:12px 0}dt{color:var(--muted)}dd{margin:0;text-align:right;max-width:65%}.total{font-size:1.3rem;color:var(--accent);font-weight:750}.error-text{color:#ffcbc4}.status-icon{width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:var(--ink);font-size:1.7rem;font-weight:700;margin:12px 0 26px}.pulse{border:3px solid #3b605a;border-top-color:var(--accent);border-radius:50%;width:40px;height:40px;animation:spin 1.5s linear infinite;margin:20px 0}@keyframes spin{to{transform:rotate(360deg)}}dialog{background:var(--bg);color:inherit;border:1px solid var(--line);border-radius:20px;width:min(570px,calc(100% - 24px));max-height:90dvh;padding:24px}dialog::backdrop{background:#000c}dialog>button{margin:6px 0}.sr-only,.skip:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}.skip:focus{display:block;padding:16px}.private-banner{padding:20px 0}.private #surface{opacity:0}.private{background:#000}.private .mode-label{visibility:hidden}.private dialog{background:#000}.large{font-size:24px}.contrast{--bg:#000;--panel:#000;--line:#fff;--muted:#fff;--accent:#adffe5;background:#000;color:#fff}[hidden]{display:none!important}@media(max-width:360px){body{padding-left:16px;padding-right:16px}dl div{display:block}dd{text-align:left;max-width:100%}.top{gap:8px}dialog{padding:18px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important}}
 
 .swipe-enabled #main,.swipe-enabled #main button{touch-action:pan-y pinch-zoom}#swipe-hint{font-size:.85rem;margin-top:18px}
+/* 投影模式（stage=1）：在 .large 之上再放大標題與指示約 1.2 倍 */
+.stage h1{font-size:calc(clamp(1.8rem,6.8vw,2.4rem)*1.2)}.stage h2{font-size:1.8em}.stage .instruction{font-size:1.26rem}
 </style>
 </head>
 <body>
 <a class="skip" href="#step-title">跳到目前步驟</a>
-<header class="top"><span class="brand">TapThrough<span class="brand-dot" aria-hidden="true">●</span></span><button id="settings-open" type="button">設定</button></header>
+<header class="top"><span class="brand">TapAble<span class="brand-dot" aria-hidden="true">●</span></span><button id="settings-open" type="button">設定</button></header>
 <div class="mode-label" id="mode-label"></div>
 <div class="private-banner" id="private-banner" hidden><strong>隱私模式</strong><p>敏感資訊不會顯示在螢幕上。螢幕閱讀器仍可操作。</p><button id="private-exit" type="button">關閉隱私模式</button></div>
 <div id="surface">
@@ -31,27 +33,27 @@
   <button type="button" id="settings-close">返回操作</button>
   <label class="check"><input type="checkbox" id="swipe">直接滑動切換（Demo）</label>
   <p class="muted" id="swipe-setting-note">內容區向左滑前進、向右滑返回，上下滑捲動。使用 VoiceOver／TalkBack 時請關閉此選項。</p>
-  <label class="check"><input type="checkbox" id="tts">Demo 語音導覽（預設關閉）</label>
-  <p class="muted">使用 VoiceOver／TalkBack 時建議關閉，避免雙重朗讀。開啟後會播放目前引導。</p>
+  <label class="check"><input type="checkbox" id="tts">Demo 語音導覽（開始操作時自動開啟，可隨時關閉）</label>
+  <p class="muted">使用 VoiceOver／TalkBack 時建議關閉，避免雙重朗讀。密碼與身分步驟不朗讀，其餘步驟語音照常；手動關閉後不會再自動開啟。</p>
   <label for="rate">語速 <output id="rate-value">0.95</output></label><input id="rate" type="range" min="0.7" max="1.2" step="0.05" value="0.95">
-  <fieldset><legend>引導版本</legend><label class="check"><input type="radio" name="version" value="A">A 版 · 絕對距離</label><label class="check"><input type="radio" name="version" value="B" checked>B 版 · 相對觸覺</label></fieldset>
-  <p class="muted">所有引導距離維持【待填】，待現場量測確認後由團隊更新。</p>
   <label class="check"><input id="private" type="checkbox">隱私模式／黑屏</label>
   <label class="check"><input id="contrast" type="checkbox">高對比</label>
   <label class="check"><input id="large" type="checkbox">較大文字</label>
-  <details><summary>實測值輸入</summary><p>只記錄機台尺寸，不儲存身分或交易資料。尺寸不會自動填入語音距離。</p>
-  <label for="measure-w">螢幕寬（公分）</label><input id="measure-w" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="【待填】">
-  <label for="measure-h">螢幕高（公分）</label><input id="measure-h" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="【待填】">
-  <label for="measure-floor">螢幕下緣離地高度（公分，選填）</label><input id="measure-floor" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="【待填】">
-  <p id="measure-note" role="status"></p></details>
-  <details><summary>關於 TapThrough</summary><p>讓機台流程回到你熟悉的手機上。本次以測試資料模擬身分驗證、付款與列印。手機提供操作及引導，實體機台負責收款與取件。</p></details>
+  <details id="llm-settings"><summary>進階（選用）：LLM 意圖解析</summary>
+  <p class="muted">語音辨識出的文字可先交給你自己的 LLM 端點解析意圖；未設定、逾時或回傳格式不符時自動改用關鍵字比對。以下設定只存在這台手機的瀏覽器，不會上傳到本專案任何伺服器。</p>
+  <label for="llm-endpoint">端點</label><input id="llm-endpoint" type="url" autocomplete="off" placeholder="https://api.openai.com/v1/chat/completions">
+  <label for="llm-model">模型</label><input id="llm-model" type="text" autocomplete="off" placeholder="gpt-4o-mini">
+  <label for="llm-key">API key</label><input id="llm-key" type="password" autocomplete="off">
+  <p id="llm-status" class="muted" role="status"></p>
+  <button type="button" id="llm-clear">清除 LLM 設定</button></details>
+  <details><summary>關於 TapAble</summary><p>讓機台流程回到你熟悉的手機上。本次以測試資料模擬身分驗證、付款與列印。手機提供操作及引導，實體機台負責收款與取件。</p></details>
   <button type="button" id="restart">重新開始</button>
 </dialog>
 <dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">重新開始？</h2><p>將清除本次選擇。如果已在實體機台投幣，請先確認機台狀態；此操作不會取消付款或退款。</p><button id="reset-cancel" type="button" autofocus>繼續目前操作</button><button id="reset-confirm" type="button">清除並重新開始</button></dialog>
 <div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
 <div class="sr-only" id="error-announcer" role="alert" aria-atomic="true"></div>
 <noscript>此互動原型需要 JavaScript。請啟用後重新開啟。</noscript>
-<script>globalThis.TT={machines:{"campus-document-kiosk":{"machineId":"campus-document-kiosk","machineName":"校園文件自動服務機","organization":"","location":"校內位置【待填】","paymentMethod":["cash"],"timeoutSeconds":600,"physicalActions":{"cash":"先按現金，才能投幣。","coins":"勿投 1 元，機器會當機。投幣口收 5、10、50 元硬幣，請一次投入一枚。","collect":"請取走文件、收據與找零。用悠遊卡的話，交易後記得拿出卡片。"},"screens":[{"id":1,"name":"語言選擇","photos":"1"},{"id":2,"name":"身分選擇","photos":"2"},{"id":3,"name":"輸入身分","photos":"3–4"},{"id":4,"name":"認證處理中","photos":"5"},{"id":5,"name":"申請項目與份數","photos":"6–7"},{"id":6,"name":"名次類型","photos":"8–9"},{"id":7,"name":"學年期","photos":"10–11"},{"id":8,"name":"確認清單","photos":"12"},{"id":9,"name":"付款方式與資料處理","photos":"13–14"},{"id":10,"name":"投幣與金額檢查","photos":"15–19"},{"id":11,"name":"列印與收據處理","photos":"20–23"},{"id":12,"name":"是否繼續申請","photos":"24"}],"availableServices":[{"id":"rank","name":"中文成績名次證明書","description":"立即列印 · R2 實測項目","price":20,"requiresSemester":true,"requiresRank":true,"maxCopies":5,"enabled":true},{"id":"history","name":"中文歷年成績表","description":"立即取件","price":15,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"student-card","name":"學生證補發","description":"3 工作天 · 本次原型未提供","price":200,"requiresSemester":false,"maxCopies":1,"enabled":false},{"id":"english","name":"英文成績單","description":"領取後須至櫃台加蓋鋼印","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"enrollment","name":"中文在學證明書","description":"在學文件","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"enrollment-en","name":"英文在學證明書","description":"領取後須至櫃台加蓋鋼印","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"diploma","name":"中英文畢業證（明）書影本加蓋關防或鋼印","description":"3 工作天 · 本次原型未提供","price":10,"requiresSemester":false,"maxCopies":5,"enabled":false},{"id":"envelope","name":"成績單之信封彌封","description":"臨櫃辦理 · 本次原型未提供","price":5,"requiresSemester":false,"maxCopies":5,"enabled":false},{"id":"semester-transcript","name":"中文學期成績單","description":"學期成績文件","price":15,"requiresSemester":true,"maxCopies":5,"enabled":true},{"id":"weighted","name":"規整加權成績名次證明書","description":"限特定獎學金 · 本次原型未提供","price":20,"requiresSemester":true,"maxCopies":5,"enabled":false},{"id":"expected","name":"預期畢業（在學）證明","description":"1 工作天 · 本次原型未提供","price":20,"requiresSemester":false,"maxCopies":5,"enabled":false}],"rankTypes":["當學期班級名次","當學期分組名次","當學期系科所名次","在校各學期班級名次","在校各學期分組名次","在校各學期系科所名次","畢業班級名次","畢業分組名次","畢業系科所名次"],"semesters":["114 學年度第 2 學期","114 學年度第 1 學期","113 學年度第 2 學期","115 學年度第 1 學期"],"v1Ratios":{"language":{"x":0.8,"y":0.32},"confirm":{"x":0.78,"y":0.42},"cash":{"x":0.5,"y":0.63}},"guidance":{"LANGUAGE":{"A":"中文版按鈕離右緣【待填】公分，離上緣【待填】公分。","B":"先確認螢幕邊框。中文版在右側；沿邊框移動【待填】，再向內移動【待填】。"},"ROLE":{"A":"學生／校友按鈕離右緣【待填】公分，離上緣【待填】公分。","B":"學生／校友按鈕在右側，沿邊框移動【待填】。"},"AUTH":{"A":"機台確定按鈕離右緣【待填】公分，離下緣【待填】公分。","B":"機台確定按鈕在右下方，沿邊框移動【待填】。"},"SERVICE":{"A":"申請項目離上緣【待填】公分。","B":"依名稱選擇文件，實體定位【待填】。"},"COPIES":{"A":"份數控制離下緣【待填】公分。","B":"確認所需份數，實體定位【待填】。"},"RANK":{"A":"名次選項離左緣【待填】公分，離上緣【待填】公分。","B":"請依名稱確認名次類型，實體定位【待填】。"},"SEMESTER":{"A":"學年期選單離左緣【待填】公分，離上緣【待填】公分。","B":"學年期選單在畫面中間偏上，實體定位【待填】。"},"REVIEW":{"A":"確定按鈕離右緣【待填】公分，離上緣【待填】公分。","B":"確認清單後選確定，實體定位【待填】。"},"PAYMENT_METHOD":{"A":"現金按鈕離左緣【待填】公分，離上緣【待填】公分。","B":"現金按鈕在畫面中下方，實體定位【待填】。"},"PAYMENT_WAITING":{"A":"投幣口距螢幕邊緣【待填】公分。","B":"投幣口在機身紙鈔入口附近，實體定位【待填】。"},"PRINTING":{"A":"文件取出口離地【待填】公分。","B":"文件取出口在機身下方，沿機身移動【待填】。"},"COMPLETED":{"A":"收據出口離地【待填】公分。","B":"請確認文件取出口與收據出口，實體定位【待填】。"}}}}};
+<script>globalThis.TT={machines:{"campus-document-kiosk":{"machineId":"campus-document-kiosk","machineName":"校園文件自動服務機","organization":"","location":"校園（demo 示意）","paymentMethod":["cash"],"timeoutSeconds":600,"physicalActions":{"cash":"先按現金，才能投幣。","coins":"勿投 1 元，機器會當機。投幣口收 5、10、50 元硬幣，請一次投入一枚。","collect":"請取走文件、收據與找零。用悠遊卡的話，交易後記得拿出卡片。"},"screens":[{"id":1,"name":"語言選擇","photos":"1"},{"id":2,"name":"身分選擇","photos":"2"},{"id":3,"name":"輸入身分","photos":"3–4"},{"id":4,"name":"認證處理中","photos":"5"},{"id":5,"name":"申請項目與份數","photos":"6–7"},{"id":6,"name":"名次類型","photos":"8–9"},{"id":7,"name":"學年期","photos":"10–11"},{"id":8,"name":"確認清單","photos":"12"},{"id":9,"name":"付款方式與資料處理","photos":"13–14"},{"id":10,"name":"投幣與金額檢查","photos":"15–19"},{"id":11,"name":"列印與收據處理","photos":"20–23"},{"id":12,"name":"是否繼續申請","photos":"24"}],"availableServices":[{"id":"rank","name":"中文成績名次證明書","description":"立即列印 · R2 實測項目","price":20,"requiresSemester":true,"requiresRank":true,"maxCopies":5,"enabled":true},{"id":"history","name":"中文歷年成績表","description":"立即取件","price":15,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"student-card","name":"學生證補發","description":"3 工作天 · 本次原型未提供","price":200,"requiresSemester":false,"maxCopies":1,"enabled":false},{"id":"english","name":"英文成績單","description":"領取後須至櫃台加蓋鋼印","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"enrollment","name":"中文在學證明書","description":"在學文件","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"enrollment-en","name":"英文在學證明書","description":"領取後須至櫃台加蓋鋼印","price":20,"requiresSemester":false,"maxCopies":5,"enabled":true},{"id":"diploma","name":"中英文畢業證（明）書影本加蓋關防或鋼印","description":"3 工作天 · 本次原型未提供","price":10,"requiresSemester":false,"maxCopies":5,"enabled":false},{"id":"envelope","name":"成績單之信封彌封","description":"臨櫃辦理 · 本次原型未提供","price":5,"requiresSemester":false,"maxCopies":5,"enabled":false},{"id":"semester-transcript","name":"中文學期成績單","description":"學期成績文件","price":15,"requiresSemester":true,"maxCopies":5,"enabled":true},{"id":"weighted","name":"規整加權成績名次證明書","description":"限特定獎學金 · 本次原型未提供","price":20,"requiresSemester":true,"maxCopies":5,"enabled":false},{"id":"expected","name":"預期畢業（在學）證明","description":"1 工作天 · 本次原型未提供","price":20,"requiresSemester":false,"maxCopies":5,"enabled":false}],"rankTypes":["當學期班級名次","當學期分組名次","當學期系科所名次","在校各學期班級名次","在校各學期分組名次","在校各學期系科所名次","畢業班級名次","畢業分組名次","畢業系科所名次"],"semesters":["114 學年度第 2 學期","114 學年度第 1 學期","113 學年度第 2 學期","115 學年度第 1 學期"],"v1Ratios":{"language":{"x":0.8,"y":0.32},"confirm":{"x":0.78,"y":0.42},"cash":{"x":0.5,"y":0.63}},"guidance":{}}}};
 'use strict';
 globalThis.TT = globalThis.TT || {};
 (() => {
@@ -132,28 +134,33 @@ globalThis.TT = globalThis.TT || {};
 'use strict';
 (() => {
   class Speech {
-    constructor(notify) { this.notify=notify; this.enabled=false; this.rate=.95; this.token=0; this.unlocked=false; }
+    constructor(notify, onSpeak=null) { this.notify=notify; this.onSpeak=onSpeak; this.enabled=false; this.rate=.95; this.token=0; this.unlocked=false; this.pending=false; }
+    // 是否正在（或即將）朗讀；供「點畫面略過語音」判斷
+    get active() { return this.pending || ('speechSynthesis' in window && speechSynthesis.speaking); }
     unlock() {
       if(!('speechSynthesis' in window) || this.unlocked) return;
       // Must run directly inside the enabling button's trusted gesture.
       const silent=new SpeechSynthesisUtterance(' '); silent.volume=0;
       speechSynthesis.speak(silent); this.unlocked=true;
     }
-    stop() { ++this.token; clearTimeout(this.timer); if('speechSynthesis' in window) speechSynthesis.cancel(); }
+    stop() { ++this.token; this.pending=false; clearTimeout(this.timer); if('speechSynthesis' in window) speechSynthesis.cancel(); }
     speak(text, sensitive=false) {
       this.stop();
-      if(!this.enabled || sensitive) return;
+      if(!this.enabled || sensitive || !String(text).trim()) return;
       if(!('speechSynthesis' in window)) { this.notify('此瀏覽器無法播放 Demo 語音，請使用螢幕閱讀器或文字引導。'); return; }
-      const token=this.token;
+      const token=this.token; this.pending=true;
       // Keep the iOS cancel → setTimeout → speak workaround; invalidate stale jobs.
       this.timer=setTimeout(()=>{
         if(token!==this.token || !this.enabled) return;
         const voices=speechSynthesis.getVoices();
         const voice=voices.find(v=>/^zh[-_]TW/i.test(v.lang))||voices.find(v=>/^zh/i.test(v.lang));
-        (text.match(/[^。！？]+[。！？]?/g)||[]).filter(s=>s.trim()).forEach(part=>{
+        const parts=(text.match(/[^。！？]+[。！？]?/g)||[]).filter(s=>s.trim());
+        if(this.onSpeak && parts.length) this.onSpeak(text);
+        parts.forEach((part,i)=>{
           const u=new SpeechSynthesisUtterance(part); u.lang='zh-TW'; u.rate=this.rate;
           if(voice) u.voice=voice;
           u.onerror=e=>{ if(!['canceled','interrupted'].includes(e.error)) this.notify('語音暫時無法播放，文字與按鈕仍可操作。'); };
+          if(i===parts.length-1) u.onend=()=>{ if(token===this.token) this.pending=false; };
           speechSynthesis.speak(u);
         });
       },150);
@@ -203,21 +210,24 @@ globalThis.TT = globalThis.TT || {};
   const machine=Object.prototype.hasOwnProperty.call(TT.machines,machineId)?TT.machines[machineId]:null;
   let session=machine?new TT.Session(machine,demo):null;
   let privateMode=false,version='B',recognition=null,voiceCandidate=null,voiceToken=0,asyncToken=0;
-  let liveTimer,currentCopy='',helpOpen=false;
+  let liveTimer,currentCopy='',helpOpen=false,ttsManuallyOff=false;
   let swipeEnabled=demo;
   const announce=(text,error=false)=>{
     const target=$(error?'error-announcer':'announcer');
     clearTimeout(liveTimer); $('announcer').textContent=''; $('error-announcer').textContent='';
     liveTimer=setTimeout(()=>{ target.textContent=text; },60);
   };
-  const speech=new TT.Speech(text=>announce(text));
+  const speakLog=[]; // demo 測試掛鉤：每次實際送入 speechSynthesis 的整段文字
+  const speech=new TT.Speech(text=>announce(text),text=>speakLog.push(text));
+  const usable=text=>!!text && !demo;
   const auth=new TT.DemoAuthAdapter();
   const payment=new TT.PaymentAdapter(status=>dispatch('PAYMENT_STATUS',status));
   const button=(text,event,value='',className='primary')=>`<button type="button" class="${className}" data-event="${event}" data-value="${escape(value)}">${escape(text)}</button>`;
   const actions=(primary,back=true)=>`<div class="actions">${primary}${back?button('返回上一步','BACK','','secondary'):''}</div>`;
   const choice=(text,event,value,description='')=>`<button type="button" class="choice" data-event="${event}" data-value="${escape(value)}">${escape(text)}${description?`<small>${escape(description)}</small>`:''}</button>`;
   const heading=(title,body)=>`<h1 id="step-title" tabindex="-1">${title}</h1>${body}`;
-  const sensitive=()=> privateMode || ['AUTH','VERIFYING','REVIEW'].includes(session?.state);
+  // 只有密碼／身分步驟靜音；REVIEW 金額要覆誦，隱私模式（黑屏）不影響語音
+  const sensitive=()=> ['AUTH','VERIFYING'].includes(session?.state);
   function swipeAction() {
     if(!session)return null;
     const defaults={
@@ -242,7 +252,19 @@ globalThis.TT = globalThis.TT || {};
   }
   function guide(state) {
     const text=machine?.guidance[state]?.[version];
-    return text?`<p class="note">${version} 版機台引導：${escape(text)}</p>`:'';
+    return usable(text)?`<p class="note">${version} 版機台引導：${escape(text)}</p>`:'';
+  }
+  // 語音輸入：各步驟的按鈕文字與提示
+  const VOICE_STATES={
+    SERVICE:{label:'用語音選擇',prompt:'說出文件名稱，可順帶說份數（例如「在學證明兩份」），確認後才會套用。',listen:'請說出文件名稱'},
+    COPIES:{label:'用語音選擇',prompt:'說出份數（一到五），確認後才會套用。',listen:'請說出份數'},
+    REVIEW:{label:'用語音確認',prompt:'說「確認」送出申請，或說「返回」修改內容，確認後才會套用。',listen:'請說確認或返回'},
+    SEMESTER:{label:'用語音選擇',prompt:'說出學年與學期，確認後才會套用。',listen:'請說出學年與學期'}
+  };
+  const hasRecognition=()=>!!(window.SpeechRecognition||window.webkitSpeechRecognition);
+  function voiceSection(state) {
+    const v=VOICE_STATES[state]; if(!v) return '';
+    return `<section aria-label="語音輸入" class="card"><button type="button" class="secondary" id="voice-start">${v.label}</button><p id="voice-status">${hasRecognition()?v.prompt:'此瀏覽器目前無法使用網頁語音辨識。你仍然可以使用手機的系統語音輸入，或使用畫面選項完成操作。'}</p><div id="voice-result"></div></section>`;
   }
   function summary() {
     return `<div class="card"><dl><div><dt>申請文件</dt><dd>${escape(session.service.name)}</dd></div>${session.order.rank?`<div><dt>名次類型</dt><dd>${escape(session.order.rank)}</dd></div>`:''}${session.order.semester?`<div><dt>學年期</dt><dd>${escape(session.order.semester)}</dd></div>`:''}<div><dt>份數</dt><dd>${session.order.copies}</dd></div><div><dt>單價</dt><dd>NT$${session.service.price}</dd></div><div class="total"><dt>總金額</dt><dd>NT$${session.total}</dd></div></dl></div>`;
@@ -253,20 +275,20 @@ globalThis.TT = globalThis.TT || {};
     ROLE:()=>heading('選擇你的身分',`<p>請選擇對應身分。</p>${choice('學生／校友','CHOOSE_ROLE','student')}${choice('教職員工','CHOOSE_ROLE','staff','本次原型僅支援學生／校友流程')}${guide('ROLE')}${actions('',true)}`),
     AUTH:()=>heading('使用測試身分',`<p>Prototype 測試資料。請勿輸入真實個資。</p><p class="note">測試學號：12345678<br>測試生日：20000101（西元年月日）</p><button class="secondary" type="button" id="auth-private">${privateMode?'關閉':'啟用'}隱私模式</button><form id="auth-form" novalidate><label for="student-id">測試學號（8 碼）</label><input id="student-id" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><label for="birthday">測試生日（8 碼）</label><input id="birthday" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-describedby="auth-hint auth-error"><p id="auth-hint" class="muted">僅接受上述測試值。也可直接使用下方 Demo 身分。</p><p id="auth-error" class="error-text"></p><div class="actions"><button class="primary" type="submit">驗證測試資料</button>${button('使用 Demo 身分繼續','DEMO_AUTH','','secondary')}${button('返回上一步','BACK','','secondary')}</div></form>${guide('AUTH')}`),
     VERIFYING:()=>heading('認證處理中',`<div class="pulse" aria-hidden="true"></div><p role="status">正在驗證測試身分，請稍候。</p><p class="muted">這是本機模擬，未傳送資料。</p>`),
-    SERVICE:()=>heading('選擇申請文件',`<p>先選文件，下一步選擇份數。</p>${machine.availableServices.map(s=>s.enabled?choice(`${s.name} · NT$${s.price}`,'CHOOSE_SERVICE',s.id,s.description):`<div class="card"><strong>${escape(s.name)} · NT$${s.price}</strong><p class="muted">${escape(s.description)}</p></div>`).join('')}${guide('SERVICE')}${actions('',true)}`),
-    COPIES:()=>heading('需要幾份？',`<p>${escape(session.service.name)} · 每份 NT$${session.service.price}</p><form id="copies-form"><fieldset><legend>選擇份數</legend>${Array.from({length:session.service.maxCopies},(_,i)=>`<label class="check"><input type="radio" name="copies" value="${i+1}" ${session.order.copies===i+1?'checked':''}>${i+1} 份</label>`).join('')}</fieldset><p class="total" id="copies-total">總金額 NT$${session.total}</p>${guide('COPIES')}<div class="actions"><button type="submit" class="primary">確認份數</button>${button('返回上一步','BACK','','secondary')}</div></form>`),
+    SERVICE:()=>heading('選擇申請文件',`<p>先選文件，下一步選擇份數。</p>${machine.availableServices.map(s=>s.enabled?choice(`${s.name} · NT$${s.price}`,'CHOOSE_SERVICE',s.id,s.description):`<div class="card"><strong>${escape(s.name)} · NT$${s.price}</strong><p class="muted">${escape(s.description)}</p></div>`).join('')}${voiceSection('SERVICE')}${guide('SERVICE')}${actions('',true)}`),
+    COPIES:()=>heading('需要幾份？',`<p>${escape(session.service.name)} · 每份 NT$${session.service.price}</p><form id="copies-form"><fieldset><legend>選擇份數</legend>${Array.from({length:session.service.maxCopies},(_,i)=>`<label class="check"><input type="radio" name="copies" value="${i+1}" ${session.order.copies===i+1?'checked':''}>${i+1} 份</label>`).join('')}</fieldset><p class="total" id="copies-total">總金額 NT$${session.total}</p>${voiceSection('COPIES')}${guide('COPIES')}<div class="actions"><button type="submit" class="primary">確認份數</button>${button('返回上一步','BACK','','secondary')}</div></form>`),
     RANK:()=>heading('選擇名次類型',`<p>R2 實測選擇「在校各學期系科所名次」。</p>${machine.rankTypes.map(r=>choice(r,'CHOOSE_RANK',r)).join('')}${guide('RANK')}${actions('',true)}`),
-    SEMESTER:()=>heading('選擇學年期',`<p>R2 實測使用 114 學年度第 2 學期。</p>${machine.semesters.map(s=>choice(s,'CHOOSE_SEMESTER',s)).join('')}<section aria-label="語音選擇學期" class="card"><button type="button" class="secondary" id="voice-start">使用語音選擇</button><p id="voice-status">${window.SpeechRecognition||window.webkitSpeechRecognition?'說出學年與學期，確認後才會套用。':'此瀏覽器目前無法使用網頁語音辨識。你仍然可以使用手機的系統語音輸入，或使用上方選項完成操作。'}</p><div id="voice-result"></div></section>${guide('SEMESTER')}${actions('',true)}`),
-    REVIEW:()=>heading('確認申請',`<p>請確認文件、學年期與金額。</p><button type="button" class="secondary" id="review-private">${privateMode?'關閉':'啟用'}隱私模式</button>${summary()}${guide('REVIEW')}${actions(button('確認申請','CONFIRM'))}`),
+    SEMESTER:()=>heading('選擇學年期',`<p>R2 實測使用 114 學年度第 2 學期。</p>${machine.semesters.map(s=>choice(s,'CHOOSE_SEMESTER',s)).join('')}${voiceSection('SEMESTER')}${guide('SEMESTER')}${actions('',true)}`),
+    REVIEW:()=>heading('確認申請',`<p>請確認文件、學年期與金額。</p><button type="button" class="secondary" id="review-private">${privateMode?'關閉':'啟用'}隱私模式</button>${summary()}${voiceSection('REVIEW')}${guide('REVIEW')}${actions(button('確認申請','CONFIRM'))}`),
     PAYMENT_METHOD:()=>heading('先選擇現金',`<p class="total">應付金額 NT$${session.total}</p><div class="card"><p><strong>${escape(machine.physicalActions.cash)}</strong></p><p>${escape(machine.physicalActions.coins)}</p></div>${guide('PAYMENT_METHOD')}${actions(button(demo?'現金 · 開始模擬付款':'已在機台按下現金','CASH'))}<p class="muted">${demo?'此按鈕只模擬付款等待，不會收款。':'請先在實體機台按下現金，再回到手機繼續。'}</p>`),
-    PAYMENT_WAITING:()=>heading('等待機台付款',`<p class="total">應付金額 NT$${session.total}</p><p class="instruction">${demo?'模擬付款等待中，請由陪同者使用下方 Demo controls。':'請在實體機台確認應繳金額與投入金額。這個原型不會自動取得機台付款資訊。'}</p><div class="card"><p>${escape(machine.physicalActions.cash)}</p><p><strong>${escape(machine.physicalActions.coins)}</strong></p></div>${guide('PAYMENT_WAITING')}${!demo?actions(button('已確認機台收款完成','MANUAL_PAID'),false):''}<button type="button" class="secondary" id="help">請求協助</button>`),
+    PAYMENT_WAITING:()=>heading('等待機台付款',`<p class="total">應付金額 NT$${session.total}</p><p class="instruction">${demo?'Demo：按下方按鈕模擬機台收款完成（真實情境由機台收款）。':'請在實體機台確認應繳金額與投入金額。這個原型不會自動取得機台付款資訊。'}</p><div class="card"><p>${escape(machine.physicalActions.cash)}</p><p><strong>${escape(machine.physicalActions.coins)}</strong></p></div>${guide('PAYMENT_WAITING')}${actions(demo?button('Demo：模擬機台收款完成','SIM_PAID'):button('已確認機台收款完成','MANUAL_PAID'),false)}<button type="button" class="secondary" id="help">請求協助</button>`),
     PAYMENT_SUCCESS:()=>heading('付款成功',`<div class="status-icon" aria-hidden="true">✓</div><p>${demo?'模擬付款已確認。':'已依你的確認記錄收款狀態。'}</p><p>接著處理文件，請稍候。</p>`),
-    PROCESSING:()=>heading('文件正在處理',`<div class="pulse" aria-hidden="true"></div><p role="status">正在準備列印文件。</p><p>${demo?'請由陪同者在 Demo controls 模擬列印完成。':'請等待實體機台顯示列印成功，並確認文件已送出。'}</p>${!demo?actions(button('機台已列印成功','PRINT_READY'),false):''}`),
+    PROCESSING:()=>heading('文件正在處理',`<div class="pulse" aria-hidden="true"></div><p role="status">正在準備列印文件。</p><p>${demo?'Demo：按下方按鈕模擬機台列印完成（真實情境由機台列印）。':'請等待實體機台顯示列印成功，並確認文件已送出。'}</p>${actions(button(demo?'Demo：模擬機台列印完成':'機台已列印成功','PRINT_READY'),false)}`),
     PRINTING:()=>heading('文件已列印完成',`<div class="status-icon" aria-hidden="true">✓</div><p>${demo?'模擬文件已送至機台列印。':'已依你的確認記錄列印完成。'}</p><p>${escape(session.service.name)}已完成列印。</p><div class="card"><p>${escape(machine.physicalActions.collect)}</p><p>文件取出口在機身最下方；收據出口在機身中段。</p>${session.service.id==='english'||session.service.id==='enrollment-en'?'<p>英文文件領取後，請至櫃台加蓋鋼印。</p>':''}</div>${guide('PRINTING')}${actions(button('已取走文件、收據與找零','COLLECT'),false)}`),
     COMPLETED:()=>heading('操作完成',`<div class="status-icon" aria-hidden="true">✓</div><p>本次文件申請流程已完成，測試身分與申請資料已清除。</p><p class="note">${escape(machine.physicalActions.collect)}</p>${guide('COMPLETED')}${actions(button('完成操作','RESET')+button('再次申請文件','AGAIN','','secondary'),false)}`),
     ERROR:()=>{
       const kind=session.error.kind;
-      const messages={timeout:['操作時間已到','600 秒已到。目前尚未收到新的機台狀態。請先確認實體機台是否已回到首頁；手機無法延長機台時間。'],payment:['付款未完成','目前無法確認收款結果。若已投入款項，請保留在機台前並請求協助，避免重複投幣。'],unavailable:['機台暫時無法使用','請確認現場機台狀態，或請陪同者協助。'],role:['此身分尚未提供','目前原型支援學生／校友流程。請返回選擇。']};
+      const messages={timeout:['操作時間已到','600 秒已到。目前尚未收到新的機台狀態。請先確認實體機台是否已回到首頁；手機無法延長機台時間。'],payment:['付款未完成','目前無法確認收款結果。若已投入款項，請保留在機台前並請求協助，避免重複投幣。'],unavailable:['機台暫時無法使用','請確認現場機台狀態，或請現場服務人員協助。'],role:['此身分尚未提供','目前原型支援學生／校友流程。請返回選擇。']};
       const [title,text]=messages[kind]||messages.unavailable;
       const resume=kind==='payment'?'回到等待付款':kind==='timeout'?'已確認機台仍有效，繼續等待':'返回原步驟';
       return heading(title,`<p class="error-text">${text}</p>${kind==='timeout'?'<p>繼續等待只會重新啟動手機提醒，不代表機台交易仍有效。</p>':''}${actions(button(resume,'RESUME')+button('請求協助','HELP','','secondary')+button('重新開始','ASK_RESET','','secondary'),false)}`);
@@ -293,6 +315,27 @@ globalThis.TT = globalThis.TT || {};
       const token=asyncToken;
       setTimeout(()=>{ if(token===asyncToken) payment.receive('PROCESSING'); },1800);
     }
+  }
+  // 統一入口：SIM_* 為 demo 專用模擬事件，其餘交給 dispatch
+  function handleEvent(event,value) {
+    if(!event) return;
+    if(event.startsWith('SIM_')) {
+      if(!demo) return;
+      if(event==='SIM_PAID') payment.receive('PAID');
+      else if(event==='SIM_FAILED') payment.receive('FAILED');
+      else if(event==='SIM_TIMEOUT') dispatch('FAIL','timeout');
+      else if(event==='SIM_UNAVAILABLE') dispatch('FAIL','unavailable');
+      else if(event==='SIM_SPEECH') recognitionFailure('no-speech');
+      else if(event==='SIM_DENIED') recognitionFailure('not-allowed');
+      return;
+    }
+    dispatch(event,value);
+  }
+  // 按「開始操作」時預設開啟語音（使用者手勢內）；手動關閉過就不再自動開
+  function autoEnableSpeech() {
+    if(speech.enabled||ttsManuallyOff) return;
+    $('tts').checked=true; speech.enabled=true; speech.unlock();
+    $('replay').disabled=false; $('speech-stop').disabled=false;
   }
   function clearSession() { ++asyncToken; cancelRecognition(); speech.stop(); payment.clear(); session.reset(); $('announcer').textContent=''; $('error-announcer').textContent=''; helpOpen=false; }
   async function verify(id,birthday) {
@@ -322,7 +365,7 @@ globalThis.TT = globalThis.TT || {};
     $('demo-panel').hidden=!demo || !session;
     if(!demo||!session) return;
     const state=session.state;
-    $('demo-actions').innerHTML=`${state==='PAYMENT_WAITING'?button('模擬：付款完成','SIM_PAID','','secondary')+button('模擬：付款失敗','SIM_FAILED','','secondary'):''}${state==='PROCESSING'?button('模擬：列印完成','PRINT_READY','','secondary'):''}${!['CONNECTED','COMPLETED','ERROR'].includes(state)?button('模擬：600 秒逾時','SIM_TIMEOUT','','secondary'):''}${state!=='ERROR'?button('模擬：機台無法使用','SIM_UNAVAILABLE','','secondary'):''}${state==='SEMESTER'?button('模擬：語音辨識失敗','SIM_SPEECH','','secondary')+button('模擬：麥克風權限拒絕','SIM_DENIED','','secondary'):''}${button('Reset Demo','ASK_RESET','','secondary')}`;
+    $('demo-actions').innerHTML=`${state==='PAYMENT_WAITING'?button('模擬：付款完成','SIM_PAID','','secondary')+button('模擬：付款失敗','SIM_FAILED','','secondary'):''}${state==='PROCESSING'?button('模擬：列印完成','PRINT_READY','','secondary'):''}${!['CONNECTED','COMPLETED','ERROR'].includes(state)?button('模擬：600 秒逾時','SIM_TIMEOUT','','secondary'):''}${state!=='ERROR'?button('模擬：機台無法使用','SIM_UNAVAILABLE','','secondary'):''}${VOICE_STATES[state]?button('模擬：語音辨識失敗','SIM_SPEECH','','secondary')+button('模擬：麥克風權限拒絕','SIM_DENIED','','secondary'):''}${button('Reset Demo','ASK_RESET','','secondary')}`;
   }
   function render(focus=true) {
     helpOpen=false;
@@ -333,8 +376,13 @@ globalThis.TT = globalThis.TT || {};
       $('main').innerHTML=pages[session.state]();
       currentCopy=$('main').querySelector('h1').textContent+'。';
       if(session.state==='CONNECTED') currentCopy=`已連接${machine.organization}${machine.machineName}。選擇開始操作以繼續。這是本機互動原型。`;
+      // REVIEW 覆誦申請內容與金額（隱私模式黑屏也照念，只有耳機聽得到）
+      if(session.state==='REVIEW') currentCopy+=`${session.service.name}${session.order.rank?'，'+session.order.rank:''}${session.order.semester?'，'+session.order.semester:''}，${session.order.copies} 份，總金額 ${session.total} 元。`;
+      // 狀態變化以震動回饋（裝置不支援時靜默略過）
+      if(['PAYMENT_SUCCESS','PRINTING','COMPLETED','ERROR'].includes(session.state)) try { navigator.vibrate?.(session.state==='ERROR'?[90,60,90]:250); } catch {}
       if(!sensitive()) {
-        currentCopy+=(machine.guidance[session.state]?.[version]||'');
+        const g=machine.guidance[session.state]?.[version];
+        if(usable(g)) currentCopy+=g;
         if(['PAYMENT_METHOD','PAYMENT_WAITING'].includes(session.state)) currentCopy+=machine.physicalActions.cash+machine.physicalActions.coins;
         if(['PRINTING','COMPLETED'].includes(session.state)) currentCopy+=machine.physicalActions.collect;
       }
@@ -349,15 +397,21 @@ globalThis.TT = globalThis.TT || {};
     announce(messages[session?.state]||$('step-title').textContent,session?.state==='ERROR'||!!(machineId&&!machine));
     speech.speak(currentCopy,sensitive());
   }
+  // 點畫面任一處空白（控制元件與對話框除外）：正在朗讀就閉嘴，不影響 SwipeNavigator
+  document.addEventListener('click',e=>{
+    if(e.target.closest('button,input,select,textarea,a,label,summary,dialog')) return;
+    if(speech.active) { speech.stop(); announce('已略過語音。'); }
+  });
   $('main').addEventListener('click',e=>{
-    const b=e.target.closest('button'); if(!b) return;
-    if(b.dataset.event) dispatch(b.dataset.event,b.dataset.value);
+    const b=e.target.closest('button');
+    if(!b) return;
+    if(b.dataset.event) { if(b.dataset.event==='START') autoEnableSpeech(); handleEvent(b.dataset.event,b.dataset.value); }
     else if(['auth-private','review-private'].includes(b.id)) { setPrivate(!privateMode); b.textContent=privateMode?'關閉隱私模式':'啟用隱私模式'; }
     else if(b.id==='help') showHelp();
     else if(b.id==='voice-start') startRecognition();
-    else if(b.id==='voice-confirm' && voiceCandidate) dispatch('CHOOSE_SEMESTER',voiceCandidate);
+    else if(b.id==='voice-confirm' && voiceCandidate && voiceCandidate.state===session.state) { const c=voiceCandidate; voiceCandidate=null; applyIntent(c.intent,c.state); }
     else if(b.id==='voice-retry') startRecognition();
-    else if(b.id==='voice-cancel') { cancelRecognition(); $('voice-result').textContent=''; $('voice-status').textContent='已停止聆聽。請使用學期選項繼續。'; $('voice-start').focus(); }
+    else if(b.id==='voice-cancel') { cancelRecognition(); $('voice-result').textContent=''; $('voice-status').textContent='已停止聆聽。請使用畫面選項繼續。'; $('voice-start').focus(); }
   });
   $('main').addEventListener('submit',e=>{
     e.preventDefault();
@@ -371,44 +425,144 @@ globalThis.TT = globalThis.TT || {};
   } });
   $('demo-actions').addEventListener('click',e=>{
     if(!demo) return;
-    const event=e.target.closest('button')?.dataset.event;
-    if(event==='SIM_PAID') payment.receive('PAID');
-    else if(event==='SIM_FAILED') payment.receive('FAILED');
-    else if(event==='SIM_TIMEOUT') dispatch('FAIL','timeout');
-    else if(event==='SIM_UNAVAILABLE') dispatch('FAIL','unavailable');
-    else if(event==='SIM_SPEECH') recognitionFailure('no-speech');
-    else if(event==='SIM_DENIED') recognitionFailure('not-allowed');
-    else if(event) dispatch(event);
+    handleEvent(e.target.closest('button')?.dataset.event);
   });
   function recognitionFailure(error) {
     cancelRecognition();
-    const text=error==='not-allowed'?'麥克風權限未開啟。你仍可使用學期選項完成操作。':'這次沒有成功辨識。請重試，或使用學期選項完成操作。';
+    const text=error==='not-allowed'?'麥克風權限未開啟。你仍可使用畫面選項完成操作。':'這次沒有成功辨識。請重試，或使用畫面選項完成操作。';
     if($('voice-status')) $('voice-status').textContent=text;
     if($('voice-result')) $('voice-result').innerHTML='';
     $('voice-start')?.focus(); announce(text,true);
   }
+  // ===== 語音意圖解析（純關鍵字，全瀏覽器端） =====
+  const NUM={'一':1,'1':1,'１':1,'二':2,'兩':2,'2':2,'２':2,'三':3,'3':3,'３':3,'四':4,'4':4,'４':4,'五':5,'5':5,'５':5};
+  const NUM_RE='[一二兩三四五1-5１-５]';
+  // 順序重要：較長／較特定的關鍵字先比對
+  const SERVICE_KEYWORDS=[
+    ['enrollment-en',/英文.{0,3}在學|在學.{0,3}英文/],
+    ['english',/英文.{0,3}成績|成績.{0,3}英文/],
+    ['rank',/名次/],
+    ['semester-transcript',/學期成績/],
+    ['history',/歷年|成績表/],
+    ['enrollment',/在學/]
+  ];
+  const enabledServices=()=>machine.availableServices.filter(s=>s.enabled);
+  const normalizeSemester=text=>text.replace(/一百一十/g,'一一').replace(/一一五/g,'115').replace(/一一四/g,'114').replace(/一一三/g,'113').replace(/第一/g,'第1').replace(/第二/g,'第2').replace(/上學期/g,'第1學期').replace(/下學期/g,'第2學期');
+  function parseIntent(transcript,state) {
+    const text=String(transcript??'').replace(/\s/g,'');
+    if(!text||!machine) return null;
+    if(state==='SERVICE') {
+      const hit=SERVICE_KEYWORDS.find(([id,re])=>re.test(text)&&enabledServices().some(s=>s.id===id));
+      if(!hit) return null;
+      const out={service:hit[0]};
+      const m=text.match(new RegExp(`(${NUM_RE})(?:份|張)`)); if(m) out.copies=NUM[m[1]];
+      return out;
+    }
+    if(state==='COPIES') { const m=text.match(new RegExp(NUM_RE)); return m?{copies:NUM[m[0]]}:null; }
+    if(state==='REVIEW') {
+      if(/取消|返回|不要|不對|不用|不好|不是|等一下|回上一步|修改/.test(text)) return {action:'BACK'};
+      // 單字「好／對／是」只在整句就是這個字時才算確認，避免任意句子誤判
+      if(/確認|確定|沒問題|可以|^(好|對|是)(的|啊|呀)?$|^ok$/i.test(text)) return {action:'CONFIRM'};
+      return null;
+    }
+    if(state==='SEMESTER') {
+      const n=normalizeSemester(text);
+      const s=machine.semesters.find(s=>n.includes(s.slice(0,3))&&n.includes(s.includes('第 2')?'第2':'第1'));
+      return s?{semester:s}:null;
+    }
+    return null;
+  }
+  // 驗證 LLM 或關鍵字結果，只保留此步驟合法的欄位
+  function sanitizeIntent(raw,state) {
+    if(!raw||typeof raw!=='object') return null;
+    const out={};
+    if(state==='SERVICE'&&typeof raw.service==='string'&&enabledServices().some(s=>s.id===raw.service)) out.service=raw.service;
+    if(['SERVICE','COPIES'].includes(state)) { const c=Number(raw.copies); if(Number.isInteger(c)&&c>=1&&c<=5) out.copies=c; }
+    if(state==='REVIEW'&&['CONFIRM','BACK'].includes(raw.action)) out.action=raw.action;
+    if(state==='SEMESTER'&&machine.semesters.includes(raw.semester)) out.semester=raw.semester;
+    const ok={SERVICE:!!out.service,COPIES:!!out.copies,REVIEW:!!out.action,SEMESTER:!!out.semester}[state];
+    return ok?out:null;
+  }
+  // ===== 選用：LLM 意圖層（設定只存 localStorage；key 不進原始碼、不進 console） =====
+  const LLM_DEFAULTS={endpoint:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini'};
+  const llm={endpoint:'',model:'',key:''};
+  try { Object.keys(llm).forEach(k=>{ llm[k]=localStorage.getItem('tapable.llm.'+k)||''; }); } catch {}
+  const llmConfig=()=>({endpoint:llm.endpoint.trim()||LLM_DEFAULTS.endpoint,model:llm.model.trim()||LLM_DEFAULTS.model,key:llm.key.trim()});
+  function voiceContext(state) {
+    return {state,services:state==='SERVICE'?enabledServices().map(s=>({id:s.id,name:s.name})):[],maxCopies:session?.service?.maxCopies||5,semesters:state==='SEMESTER'?machine.semesters:[]};
+  }
+  async function parseIntentLLM(transcript,state,ctx) {
+    const cfg=llmConfig(); if(!cfg.key||!VOICE_STATES[state]) return null;
+    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),4000);
+    try {
+      const system=[
+        '你是校園文件自動服務機的語音意圖解析器。使用者說的是台灣正體中文。只輸出一個 JSON 物件，不要任何其他文字。',
+        `目前步驟：${state}。`,
+        state==='SERVICE'?`可選文件 service id 與名稱：${JSON.stringify(ctx.services)}。輸出 {"service": id, "copies": 1-${ctx.maxCopies} 的整數（未提到則省略）}。`:'',
+        state==='COPIES'?`輸出 {"copies": 1-${ctx.maxCopies} 的整數}。`:'',
+        state==='REVIEW'?'使用者同意送出申請輸出 {"action":"CONFIRM"}；想取消、返回或修改輸出 {"action":"BACK"}。':'',
+        state==='SEMESTER'?`可選學年期：${JSON.stringify(ctx.semesters)}。輸出 {"semester": 其中一個完整字串}。`:'',
+        '無法判斷時輸出 {}。'
+      ].filter(Boolean).join('\n');
+      const res=await fetch(cfg.endpoint,{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json',Authorization:`Bearer ${cfg.key}`},
+        body:JSON.stringify({model:cfg.model,temperature:0,response_format:{type:'json_object'},messages:[{role:'system',content:system},{role:'user',content:String(transcript)}]})});
+      if(!res.ok) return null;
+      const data=await res.json();
+      const content=data?.choices?.[0]?.message?.content;
+      if(typeof content!=='string') return null;
+      return sanitizeIntent(JSON.parse(content),state);
+    } catch { return null; } finally { clearTimeout(timer); }
+  }
+  function describeIntent(intent,state) {
+    if(state==='SERVICE') return `${machine.availableServices.find(s=>s.id===intent.service)?.name||''}${intent.copies?`，${intent.copies} 份`:''}`;
+    if(state==='COPIES') return `${intent.copies} 份`;
+    if(state==='REVIEW') return intent.action==='CONFIRM'?'確認申請':'返回上一步';
+    return intent.semester||'';
+  }
+  function applyIntent(intent,state) {
+    if(!session||session.state!==state) return;
+    if(state==='SERVICE') { dispatch('CHOOSE_SERVICE',intent.service); if(intent.copies&&session.state==='COPIES') dispatch('CHOOSE_COPIES',intent.copies); }
+    else if(state==='COPIES') dispatch('CHOOSE_COPIES',intent.copies);
+    else if(state==='REVIEW') dispatch(intent.action);
+    else if(state==='SEMESTER') dispatch('CHOOSE_SEMESTER',intent.semester);
+  }
   function startRecognition() {
     cancelRecognition(); speech.stop();
+    const state=session?.state, v=VOICE_STATES[state];
+    if(!v) return;
     const API=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!API) { announce('此瀏覽器目前無法使用網頁語音辨識，請使用學期選項。'); return; }
-    const token=voiceToken;
+    if(!API) { announce('此瀏覽器目前無法使用網頁語音辨識，請使用畫面選項。'); return; }
+    const token=voiceToken; let resolved=false;
     const rec=new API(); recognition=rec; rec.lang='zh-TW'; rec.interimResults=false; rec.continuous=false;
     $('voice-status').textContent='正在聆聽……語音服務可能使用瀏覽器提供的網路辨識。';
     $('voice-result').innerHTML='<button id="voice-cancel" type="button">停止聆聽</button>';
-    announce('正在聆聽，請說出學年與學期。');
-    rec.onresult=e=>{
-      if(token!==voiceToken||session.state!=='SEMESTER') return;
+    announce(`正在聆聽，${v.listen}。`);
+    rec.onresult=async e=>{
+      if(token!==voiceToken||session.state!==state) return;
+      resolved=true;
       const transcript=e.results[0][0].transcript;
-      const normalized=transcript.replace(/一一五/g,'115').replace(/一一四/g,'114').replace(/一一三/g,'113').replace(/第一/g,'第1').replace(/第二/g,'第2').replace(/\s/g,'');
-      voiceCandidate=machine.semesters.find(s=>normalized.includes(s.slice(0,3)) && normalized.includes(s.includes('第 2')?'第2':'第1'))||null;
-      $('voice-status').textContent=voiceCandidate?'已辨識。請確認選擇。':'沒有找到對應學期。請重新說一次，或使用學期選項。';
-      $('voice-result').innerHTML=`<p id="heard"></p>${voiceCandidate?'<button type="button" id="voice-confirm">確認使用這個學期</button>':''}<button type="button" id="voice-retry">重新說一次</button>`;
-      // Never interpret recognition output as HTML or an instruction.
-      $('heard').textContent=`我聽到：${transcript}`;
-      $(voiceCandidate?'voice-confirm':'voice-retry').focus(); announce('辨識完成，請確認或重新說一次。');
+      let intent=null, source='關鍵字比對';
+      if(llmConfig().key) {
+        $('voice-status').textContent='正在以 LLM 解析……';
+        intent=await parseIntentLLM(transcript,state,voiceContext(state));
+        if(token!==voiceToken||session.state!==state) return;
+        if(intent) source='LLM 解析';
+      }
+      if(!intent) intent=sanitizeIntent(parseIntent(transcript,state),state);
+      if(intent?.copies&&intent.copies>(session.service?.maxCopies||5)&&state==='COPIES') intent=null;
+      voiceCandidate=intent?{intent,state}:null;
+      const heard=intent?describeIntent(intent,state):'';
+      $('voice-status').textContent=intent?`已辨識（${source}）。請確認後才會套用。`:`沒有找到對應選項（${source}）。請重新說一次，或使用畫面選項。`;
+      $('voice-result').innerHTML=`<p id="heard"></p>${intent?'<button type="button" id="voice-confirm"></button>':''}<button type="button" id="voice-retry">重新說一次</button>`;
+      // 辨識結果只用 textContent，不當 HTML 或指令處理
+      $('heard').textContent=intent?`我聽到：${transcript}（解析為：${heard}）`:`我聽到：${transcript}`;
+      if(intent) $('voice-confirm').textContent=`確認：${heard}`;
+      $(intent?'voice-confirm':'voice-retry').focus();
+      const readback=intent?`我聽到${heard}，請確認。`:'沒有找到對應選項，請重新說一次。';
+      announce(readback); speech.speak(readback,sensitive());
     };
-    rec.onerror=e=>{ if(token===voiceToken) recognitionFailure(e.error); };
-    rec.onend=()=>{ if(token===voiceToken && $('voice-cancel')) recognitionFailure('no-speech'); };
+    rec.onerror=e=>{ if(token===voiceToken&&!resolved) recognitionFailure(e.error); };
+    rec.onend=()=>{ if(token===voiceToken&&!resolved&&$('voice-cancel')) recognitionFailure('no-speech'); };
     try { rec.start(); } catch { recognitionFailure('failed'); }
   }
   function setPrivate(value) {
@@ -428,44 +582,55 @@ globalThis.TT = globalThis.TT || {};
       return;
     }
     const next=swipeAction();
-    if(next)dispatch(next[0],next[1]);
+    if(next){ if(next[0]==='START') autoEnableSpeech(); dispatch(next[0],next[1]); }
     else {const message='請先依畫面確認付款或取件，處理中請稍候。';announce(message);speech.speak(message,sensitive());}
   });
   $('settings-open').onclick=()=>{ speech.stop(); cancelRecognition(); $('settings').showModal(); $('settings-title').focus(); };
   $('settings-close').onclick=()=> $('settings').close();
   $('settings').addEventListener('close',()=>{ $('settings-open').focus(); });
-  $('tts').onchange=e=>{ speech.enabled=e.target.checked; if(speech.enabled) { speech.unlock(); speech.speak(currentCopy,sensitive()); } else speech.stop(); $('replay').disabled=!speech.enabled; $('speech-stop').disabled=!speech.enabled; };
+  $('tts').onchange=e=>{ speech.enabled=e.target.checked; ttsManuallyOff=!speech.enabled; if(speech.enabled) { speech.unlock(); speech.speak(currentCopy,sensitive()); } else speech.stop(); $('replay').disabled=!speech.enabled; $('speech-stop').disabled=!speech.enabled; };
+  // LLM 設定：只寫 localStorage（tapable.llm.*）
+  const llmStatus=()=>{ $('llm-status').textContent=llm.key.trim()?'已設定 API key：語音辨識後會先嘗試 LLM 解析，失敗改用關鍵字比對。設定只存在這台裝置。':'未設定 API key：使用瀏覽器端關鍵字比對。'; };
+  [['llm-endpoint','endpoint'],['llm-model','model'],['llm-key','key']].forEach(([id,k])=>{
+    $(id).value=llm[k];
+    $(id).oninput=()=>{ llm[k]=$(id).value; try { localStorage.setItem('tapable.llm.'+k,llm[k]); } catch {} llmStatus(); };
+  });
+  $('llm-clear').onclick=()=>{ Object.keys(llm).forEach(k=>{ llm[k]=''; try { localStorage.removeItem('tapable.llm.'+k); } catch {} }); ['llm-endpoint','llm-model','llm-key'].forEach(id=>{ $(id).value=''; }); llmStatus(); announce('已清除 LLM 設定。'); };
+  llmStatus();
   $('rate').oninput=e=>{ speech.rate=Number(e.target.value); $('rate-value').textContent=e.target.value; };
-  document.querySelectorAll('[name=version]').forEach(input=>input.onchange=e=>{ version=e.target.value; render(false); });
   $('private').onchange=e=>setPrivate(e.target.checked);
   $('contrast').onchange=e=>document.documentElement.classList.toggle('contrast',e.target.checked);
   $('large').onchange=e=>document.documentElement.classList.toggle('large',e.target.checked);
-  $('replay').onclick=()=>{ speech.unlock(); speech.speak(currentCopy,sensitive()); if(sensitive()) announce('目前為敏感步驟或隱私模式，Demo 語音保持靜音，請使用螢幕閱讀器。'); };
+  $('replay').onclick=()=>{ speech.unlock(); speech.speak(currentCopy,sensitive()); if(sensitive()) announce('密碼與身分步驟不朗讀，其餘步驟語音照常。請使用螢幕閱讀器完成此步驟。'); };
   $('speech-stop').onclick=()=>speech.stop();
   $('restart').onclick=()=>{ $('settings').close(); $('reset-dialog').showModal(); };
   $('reset-cancel').onclick=()=> $('reset-dialog').close();
   $('reset-confirm').onclick=()=>{ $('reset-dialog').close(); if(session) clearSession(); render(); };
-  const measures={};
-  try { Object.assign(measures,JSON.parse(localStorage.getItem('taskA_measures')||'{}')); } catch {}
-  [['measure-w','W'],['measure-h','H'],['measure-floor','floor']].forEach(([id,key])=>{
-    if(Number.isFinite(measures[key]) && measures[key]>0) $(id).value=measures[key];
-    $(id).oninput=()=>{
-      const n=Number($(id).value); measures[key]=Number.isFinite(n)&&n>0?n:null;
-      try { localStorage.setItem('taskA_measures',JSON.stringify(measures)); $('measure-note').textContent='機台尺寸已記錄；引導距離仍為【待填】。'; }
-      catch { $('measure-note').textContent='此瀏覽器無法保存設定；尺寸僅保留到本頁關閉。'; }
-    };
-  });
   function tick() {
     if(!session) return;
     const event=session.tick(); updateClock();
     if(event==='timeout') { cancelRecognition(); ++asyncToken; speech.stop(); render(); }
-    else if(event==='reminder') { const line=`手機引導剩餘約 ${Math.ceil(session.remaining/60)} 分鐘，請留意實體機台倒數。`; announce(line); speech.speak(line,privateMode); }
+    else if(event==='reminder') { const line=`手機引導剩餘約 ${Math.ceil(session.remaining/60)} 分鐘，請留意實體機台倒數。`; announce(line); speech.speak(line,sensitive()); }
   }
   function updateClock() { if(session?.startedAt!==null&&session) $('clock').textContent=`手機提醒剩餘 ${Math.floor(session.remaining/60)} 分 ${session.remaining%60} 秒`; }
   setInterval(tick,1000);
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) { speech.stop(); cancelRecognition(); } else tick(); });
   window.addEventListener('pagehide',()=>{ clearTimeout(liveTimer); if(session) clearSession(); document.querySelectorAll('input[type=password]').forEach(i=>i.value=''); });
   window.addEventListener('pageshow',e=>{ if(e.persisted) render(); });
+  // 投影模式：stage=1 → 較大文字再放大標題
+  if(params.get('stage')==='1') { document.documentElement.classList.add('large','stage'); $('large').checked=true; }
+  if(demo) {
+    // demo 不顯示任何未量測的占位文字
+    // 測試掛鉤（僅 demo）
+    window.__OP={
+      get speechEnabled(){ return speech.enabled; },
+      get state(){ return session?.state; },
+      get privateMode(){ return privateMode; },
+      parseIntent,
+      dispatch:handleEvent,
+      speakLog
+    };
+  }
   render(false);
   if(location.protocol==='http:'||location.protocol==='https:') {
     if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{ $('offline-status').textContent='離線快取已就緒。也可下載 index.html 單檔備援。'; }).catch(()=>{ $('offline-status').textContent='離線快取未啟用；請使用下載的 index.html 單檔備援。'; });
