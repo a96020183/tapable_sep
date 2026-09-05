@@ -85,14 +85,15 @@ flowchart LR
 ## 這裡面什麼是真的（誠實揭露）
 
 - ✅ **真實機台、戴眼罩實測**：我們在校園文件列印機前做了多輪眼罩實測（實測手冊見
-  [docs/field-test-manual.md](docs/field-test-manual.md)），語音腳本的每一句距離都來自實地測量
+  [docs/field-test-manual.md](docs/field-test-manual.md)，機台 12 畫面流程規格見 [docs/kiosk-flow.md](docs/kiosk-flow.md)）。
+  實體定位引導設計為 A／B 兩版腳本（絕對距離／相對觸覺），**量測值尚未全數補齊**；demo 為模擬機台，不呈現實體距離
 - ✅ **真實視障者訪談**：三位視障者（含視障學校點字老師、助聽器使用者），
   方案滿意度平均 4.67/5；「三步原則」「可中斷語音」「黑屏操作」皆為訪談產出的設計要求
 - ✅ **真端側推論**：vision 段為 SSDLite-MobileNetV2（TensorFlow.js）真實模型輸出，
   機台確認輔以 QR 視覺標記；技術細節與限制見 [vision/README.md](vision/README.md)
 - ⚠️ **機台畫面為模擬**：真機的款項履約需要機台擁有者（銀行/醫院）開放介接，
   這是商務與法規工程，不是三天做得完的事 —— 本作品呈現的是**不需任何機台配合、
-  現在就能落地的語音導引層**；履約層為第二年路線
+  現在就能落地的語音導引層**；履約層為下一階段路線
 - ⚠️ 語音辨識使用瀏覽器內建 Web Speech API；LLM 對話意圖層開發中（見 Roadmap）
 
 ## 實測情境：從電梯口到印出文件，有沒有 TapAble 差在哪
@@ -128,6 +129,9 @@ flowchart LR
 | Web Speech API（TTS／ASR） | 瀏覽器內建 | — |
 
 模型與函式庫皆隨頁面自帶，執行期零外部網路請求；影像僅於裝置端記憶體即時處理，不儲存、不上傳。
+完整第三方授權與 NOTICE 見 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)；`kiosk-refs.json` 產生流程見 `tools/build-kiosk-refs.js`；回歸測試見 [tests/README.md](tests/README.md)。
+
+**3S 無障礙空間資訊 demo**（Roadmap 連結）為本團隊成員先前專案之原型，開發成員與本次隊伍部分不同，屬既有資源，非本次賽期產出。
 
 ## 參考來源
 
