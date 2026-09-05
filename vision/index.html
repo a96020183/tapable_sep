@@ -165,20 +165,21 @@ const COOL={vehicle:5000,person:4500,obstacle:6000,screen:9000,guide:3500,search
 const OBSTACLE=new Set(['chair','couch','dining table','bench','potted plant','refrigerator','suitcase','backpack']); // 螢幕(tv/laptop)不算「走路撞到的障礙物」，移出
 const GROW=1.18; // 面積成長 18%+ 判定為「朝你逼近」——同向移動/靜止的東西面積不變，不會觸發
 function geom(d){const b=d.bbox;return[(b[2]*b[3])/(view.width*view.height),(b[0]+b[2]/2)/view.width]}
+// 螢幕(電視/筆電)框內的偵測一律忽略——電視裡的人/車不是真的（組員實測：新聞主播被當行人）。播報與畫框共用
+function screenBoxes(dets){return dets.filter(function(d){return SCREEN.has(d.class)&&d.score>=0.5}).map(function(d){return d.bbox});}
+function onScreen(d,screens){
+  const b=d.bbox,ccx=b[0]+b[2]/2,ccy=b[1]+b[3]/2;
+  return screens.some(function(s){return ccx>=s[0]&&ccx<=s[0]+s[2]&&ccy>=s[1]&&ccy<=s[1]+s[3]&&(b[2]*b[3])<(s[2]*s[3])*0.9});
+}
 // 每個 tick 只講「最該講的那一件」，用逼近偵測濾掉同向/靜止的雜訊（組員回饋：一直平淡播報聽不清）
 function evaluate(dets,now){
   // 同類多實例（一堆人／一排椅子）只取「最近的那個」(面積最大) 當代表 ——
   // 否則 track 會被最後一個實例覆寫，方向亂跳、每幀重播，等於把雜訊問題在多人場景重新引入
-  // 螢幕(電視/筆電)框內的偵測一律忽略——電視裡的人/車不是真的（組員實測：新聞主播被當行人）
-  const screens=dets.filter(function(d){return SCREEN.has(d.class)&&d.score>=0.5}).map(function(d){return d.bbox});
-  function onScreen(d){
-    const b=d.bbox,ccx=b[0]+b[2]/2,ccy=b[1]+b[3]/2;
-    return screens.some(function(s){return ccx>=s[0]&&ccx<=s[0]+s[2]&&ccy>=s[1]&&ccy<=s[1]+s[3]&&(b[2]*b[3])<(s[2]*s[3])*0.9});
-  }
+  const screens=screenBoxes(dets);
   const rep=new Map();
   for(const d of dets){
     const cls=d.class; if(!(cls in ZH))continue;
-    if(!SCREEN.has(cls)&&onScreen(d))continue; // 螢幕內容不算真實環境物
+    if(!SCREEN.has(cls)&&onScreen(d,screens))continue; // 螢幕內容不算真實環境物
     const a=geom(d)[0], cur=rep.get(cls);
     if(!cur||a>cur.a)rep.set(cls,{d:d,a:a});
   }
@@ -335,8 +336,10 @@ function loop(){
 }
 function draw(dets){
   ctx.lineWidth=4;ctx.font='20px system-ui';
+  const screens=screenBoxes(dets);
   for(const d of dets){
     if(!(d.class in ZH))continue;
+    if(!SCREEN.has(d.class)&&onScreen(d,screens))continue; // 螢幕內容不畫框（跟播報一致）
     const x=d.bbox[0],y=d.bbox[1],w=d.bbox[2],h=d.bbox[3];
     const p0=VEHICLE.has(d.class)||d.class==='person';
     const isScr=SCREEN.has(d.class);
