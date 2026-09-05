@@ -62,7 +62,7 @@ body.marker .pad{margin-top:14px;display:inline-block;border:3px dashed #888;bor
   <label>語速 <input type="range" id="rate" min="0.8" max="1.5" step="0.1" value="1.05"></label>
 </div>
 <footer>
-輔助導引原型，非自動導盲系統——請持續使用白手杖或導盲犬。影像僅於<b>裝置端</b>即時推論後即刻丟棄：不儲存、不上傳、無任何網路傳輸。物件辨識為端側模型（SSDLite-MobileNetV2）；「螢幕→機台」為 demo 映射，機台確認以視覺標記為準。模擬機台標記頁：本網址加 <code>?marker=1</code>。
+輔助導引原型，非自動導盲系統——請持續使用白手杖或導盲犬。影像僅於<b>裝置端</b>即時推論後即刻丟棄：不儲存、不上傳、無任何網路傳輸。物件辨識為端側模型（SSDLite-MobileNetV2）；機台外觀比對使用實地照片的特徵向量（照片本體不隨頁面提供），最終確認以視覺標記為準；「螢幕→機台」為 demo 映射。模擬機台標記頁：本網址加 <code>?marker=1</code>。
 </footer>
 
 <script src="./lib/tf.min.js"></script>
@@ -91,6 +91,38 @@ const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',a
 const VEHICLE=new Set(['car','truck','motorcycle','bicycle']); // 公車/列車已整組移除（室內誤報太兇）；飛機/船不在名單
 const P0_SCORE=0.66,P0_HITS=2; // 主動警報門檻：高信心＋連續幀，畫框仍用低閾值
 const SCREEN=new Set(['tv','laptop']);
+/* ---------- 機台外觀比對（round1 實拍照片的特徵向量，照片本體不在此 repo） ---------- */
+let kioskNet=null,kioskRefs=null,kioskTh=0.72,kioskHits=0,kioskCand=null,kioskLoading=false;
+const kcv=document.createElement('canvas');kcv.width=224;kcv.height=224;
+const kcx=kcv.getContext('2d',{willReadFrequently:true});
+function initKiosk(){
+  if(kioskLoading||kioskNet)return;kioskLoading=true;
+  Promise.all([tf.loadLayersModel('./kiosk/model.json'),fetch('./kiosk-refs.json').then(r=>r.json())])
+  .then(function(rr){
+    const base=rr[0];
+    kioskNet=tf.model({inputs:base.inputs,outputs:base.getLayer('conv_pw_13_relu').output});
+    kioskRefs=rr[1].refs;kioskTh=rr[1].threshold||0.72;
+  }).catch(function(){errors++;kioskLoading=false});
+}
+function kioskEmbed(){
+  return tf.tidy(function(){
+    const t=tf.browser.fromPixels(kcv).toFloat().sub(127.5).div(127.5).expandDims(0);
+    const f=kioskNet.predict(t).mean([1,2]);
+    return Array.from(f.div(f.norm(2,1,true)).dataSync());
+  });
+}
+function kioskProbe(){ // 全幅+左中右三塊，回報最像的區塊與相似度
+  if(!kioskNet||!kioskRefs)return null;
+  const zones=[[0,0,1,1,-1],[0,0,0.5,1,0],[0.25,0,0.5,1,1],[0.5,0,0.5,1,2]];
+  let best={sim:-1,dir:1,zone:null};
+  for(const z of zones){
+    kcx.drawImage(view,view.width*z[0],view.height*z[1],view.width*z[2],view.height*z[3],0,0,224,224);
+    const v=kioskEmbed();
+    let s=-1;for(const r of kioskRefs){let d=0;for(let i=0;i<v.length;i++)d+=v[i]*r[i];if(d>s)s=d}
+    if(s>best.sim)best={sim:s,dir:z[4]<0?1:z[4],zone:z};
+  }
+  return best;
+}
 const TIERS=[[0.30,'很近'],[0.11,'近'],[0.035,'中距離'],[0,'遠']];
 const tierOf=a=>TIERS.findIndex(t=>a>=t[0]);
 const tierName=i=>TIERS[i][1];
@@ -142,6 +174,7 @@ function evaluate(dets,now){
 }
 window.__V.evaluate=function(dets){evaluate(dets,Date.now())}; // 測試掛鉤：注入合成偵測結果
 window.__V.track=function(cls){return tracks.get(cls)||null};
+window.__V.kioskInit=initKiosk;window.__V.kioskProbe=function(){return kioskNet?kioskProbe():null};
 
 /* ---------- 目標導引（機台） ---------- */
 function guideTarget(dets,now){
@@ -156,6 +189,13 @@ function guideTarget(dets,now){
     if(dir!==lastGuide.dir||tier<lastGuide.tier||now-lastGuide.t>COOL.guide){
       speak('機台在'+CLOCK[dir]+'，'+tierName(tier)+'。',false);
       lastGuide={dir:dir,tier:tier,t:now};
+    }
+    return;
+  }
+  if(kioskCand&&now-kioskCand.t<2500){ // 照片比對命中（優先於通用螢幕類別）
+    if(now-lastHint>COOL.screen){
+      speak(CLOCK[kioskCand.dir]+'發現目標機台外觀，請往那個方向靠近，接近後以標記確認。',false);
+      lastHint=now;
     }
     return;
   }
@@ -198,8 +238,8 @@ function setTarget(on){
   targetMode=on;arrived=false;$('arrive').style.display='none';
   $('target').classList.toggle('active',on);
   $('target').textContent=on?'🎯 尋找中…（點擊停止）':'🎯 尋找機台';
-  lastGuide={dir:-1,tier:99,t:0};lastSearchNote=Date.now();
-  if(on){speak('開始尋找機台。',true);setIntent('{"intent":"find_target","target":"kiosk"}')}
+  lastGuide={dir:-1,tier:99,t:0};lastSearchNote=Date.now();kioskHits=0;kioskCand=null;
+  if(on){initKiosk();speak('開始尋找機台。',true);setIntent('{"intent":"find_target","target":"kiosk"}')}
   else{speak('已停止尋找。',true);setIntent('')}
 }
 
@@ -228,6 +268,13 @@ function loop(){
     if(scanned&&lastQR)lastQR.t=Date.now(); // 推論耗時不可預期，時效以本 tick 完成時間為準
     tickMs=Math.max(100,performance.now()-t0);
     lastDets=dets;frames++;
+    if(targetMode&&!arrived&&kioskNet&&frames%2===0){ // 每兩幀比對一次外觀
+      try{
+        const kb=kioskProbe();
+        if(kb&&kb.sim>=kioskTh){kioskHits++;if(kioskHits>=2)kioskCand={t:Date.now(),dir:kb.dir,sim:kb.sim,zone:kb.zone}}
+        else kioskHits=0;
+      }catch(e){errors++}
+    }
     evaluate(dets,Date.now());
     draw(dets);
     $('diag').textContent=(model?'模型✓ ':'')+frames+'幀'+(errors?' '+errors+'錯誤':'');
@@ -246,6 +293,13 @@ function draw(dets){
     const label=ZH[d.class]+(isScr?'（映射:機台候選）':'')+' '+Math.round(d.score*100)+'%';
     ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(x,Math.max(0,y-26),ctx.measureText(label).width+12,26);
     ctx.fillStyle='#fff';ctx.fillText(label,x+6,Math.max(18,y-7));
+  }
+  if(kioskCand&&Date.now()-kioskCand.t<2500&&kioskCand.zone){
+    const z=kioskCand.zone;
+    ctx.strokeStyle='#7fd7ff';ctx.setLineDash([10,6]);
+    ctx.strokeRect(view.width*z[0]+4,view.height*z[1]+4,view.width*z[2]-8,view.height*z[3]-8);
+    ctx.setLineDash([]);
+    ctx.fillStyle='#7fd7ff';ctx.fillText('機台（外觀比對 '+Math.round(kioskCand.sim*100)+'%）',view.width*z[0]+10,view.height*z[1]+26);
   }
   if(lastQR&&Date.now()-lastQR.t<1600){
     const b=lastQR.box;ctx.strokeStyle='#ffd166';ctx.strokeRect(b[0],b[1],b[2],b[3]);

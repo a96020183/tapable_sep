@@ -11,7 +11,7 @@
 ## 技術與誠實揭露
 
 - 物件辨識：SSDLite-MobileNetV2（COCO 預訓練，TensorFlow.js 端側推論）— 行人/車輛/椅子等為真實模型輸出
-- 「螢幕→機台候選」為 demo 類別映射（畫面有標示）；機台確認以視覺標記（QR）為準
+- 機台外觀比對：實地機身照片的 MobileNet 特徵向量（kiosk-refs.json，僅數字向量，照片本體不在本 repo）＋連續兩幀 ≥0.72 才提示；「螢幕→機台候選」為備援映射（畫面有標示）；最終確認以視覺標記（QR）為準
 - 距離為 bounding box 面積級距（很近/近/中距離/遠），**不輸出未經測量的公尺數**
 - 事件驅動播報：新事件才出聲、同物件冷卻靜默；P0（車輛/行人接近）可打斷其他語音
 - 影像僅於裝置端記憶體即時處理，**不儲存、不上傳、零外部網路請求**（模型與函式庫皆隨頁面自帶）
@@ -26,3 +26,4 @@
 | SSDLite-MobileNetV2 權重 | tfjs-models | Apache-2.0（COCO 預訓練） |
 | jsQR | 1.4.0 | Apache-2.0 |
 | qrcode-generator | 1.4.4 | MIT |
+| MobileNet v1 0.25（機台外觀比對用嵌入模型） | tfjs-models | Apache-2.0 |
