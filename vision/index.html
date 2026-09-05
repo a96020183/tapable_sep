@@ -30,6 +30,9 @@ footer{margin:14px;color:var(--muted);font-size:.78rem;border-top:1px solid var(
 body.blackout #stage,body.blackout #settings,body.blackout footer,body.blackout header{display:none}
 body.blackout{background:#000}
 body.blackout #live{font-size:1.6rem;padding-top:30vh;text-align:center}
+body.blackout .row button{background:#0a0d10;color:#5a646f;border-color:#20262d}
+#exitBlack{display:none}
+body.blackout #exitBlack{display:block;position:fixed;bottom:12px;left:12px;right:12px;background:#0a0d10;color:#6b7681;border:1px solid #20262d;border-radius:12px;padding:14px;font-size:1rem}
 #arrive{display:none;margin:10px 14px;padding:14px;border:1px solid var(--accent);border-radius:12px;color:var(--accent);font-weight:700;font-size:1.2rem;text-align:center}
 /* 模擬機台標記頁 */
 body.marker{background:#fff;color:#111;text-align:center}
@@ -41,7 +44,7 @@ body.marker .pad{margin-top:14px;display:inline-block;border:3px dashed #888;bor
 </head>
 <body>
 <header><h1>TapThrough Vision</h1><span id="diag" aria-hidden="true">初始化…</span></header>
-<div id="stage"><canvas id="view" width="480" height="360"></canvas></div>
+<div id="stage"><canvas id="view" width="640" height="480"></canvas></div>
 <p id="live" role="status" aria-live="assertive">按「開始導引」啟動鏡頭與語音。</p>
 <p id="intent"></p>
 <div id="arrive">✓ 已抵達目標機台</div>
@@ -53,6 +56,7 @@ body.marker .pad{margin-top:14px;display:inline-block;border:3px dashed #888;bor
   <button id="ask" disabled>附近有什麼？</button>
   <button id="mic" disabled>🎤 語音指令</button>
 </div>
+<button id="exitBlack">☀ 退出黑屏模式</button>
 <div id="settings">
   <label><input type="checkbox" id="blackout">黑屏模式（防窺，語音照常）</label>
   <label>語速 <input type="range" id="rate" min="0.8" max="1.5" step="0.1" value="1.05"></label>
@@ -83,8 +87,8 @@ if(P.get('marker')){
 const NOSPEECH=P.get('nospeech')==='1', AUTOSTART=P.get('autostart')==='1';
 const view=$('view'),ctx=view.getContext('2d',{willReadFrequently:true});
 const live=$('live');
-const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',bus:'公車',truck:'卡車','traffic light':'紅綠燈','stop sign':'停車標誌','fire hydrant':'消防栓',bench:'長椅',chair:'椅子',dog:'狗',backpack:'背包',umbrella:'雨傘',suitcase:'行李箱','potted plant':'盆栽',tv:'螢幕',laptop:'筆電螢幕','cell phone':'手機'};
-const VEHICLE=new Set(['car','bus','truck','motorcycle','bicycle']);
+const ZH={person:'行人',bicycle:'自行車',car:'汽車',motorcycle:'機車',airplane:'飛機',bus:'公車',train:'列車',truck:'卡車',boat:'船','traffic light':'紅綠燈','fire hydrant':'消防栓','stop sign':'停車標誌','parking meter':'停車收費表',bench:'長椅',bird:'鳥',cat:'貓',dog:'狗',horse:'馬',sheep:'羊',cow:'牛',elephant:'大象',bear:'熊',zebra:'斑馬',giraffe:'長頸鹿',backpack:'背包',umbrella:'雨傘',handbag:'手提包',tie:'領帶',suitcase:'行李箱',frisbee:'飛盤',skis:'滑雪板',snowboard:'滑雪板','sports ball':'球',kite:'風箏','baseball bat':'球棒','baseball glove':'棒球手套',skateboard:'滑板',surfboard:'衝浪板','tennis racket':'球拍',bottle:'瓶子','wine glass':'玻璃杯',cup:'杯子',fork:'叉子',knife:'刀',spoon:'湯匙',bowl:'碗',banana:'香蕉',apple:'蘋果',sandwich:'三明治',orange:'柳橙',broccoli:'花椰菜',carrot:'紅蘿蔔','hot dog':'熱狗',pizza:'披薩',donut:'甜甜圈',cake:'蛋糕',chair:'椅子',couch:'沙發','potted plant':'盆栽',bed:'床','dining table':'桌子',toilet:'馬桶',tv:'螢幕',laptop:'筆電螢幕',mouse:'滑鼠',remote:'遙控器',keyboard:'鍵盤','cell phone':'手機',microwave:'微波爐',oven:'烤箱',toaster:'烤麵包機',sink:'洗手台',refrigerator:'冰箱',book:'書',clock:'時鐘',vase:'花瓶',scissors:'剪刀','teddy bear':'玩偶','hair drier':'吹風機',toothbrush:'牙刷'};
+const VEHICLE=new Set(['car','bus','truck','motorcycle','bicycle','train']);
 const SCREEN=new Set(['tv','laptop']);
 const TIERS=[[0.30,'很近'],[0.11,'近'],[0.035,'中距離'],[0,'遠']];
 const tierOf=a=>TIERS.findIndex(t=>a>=t[0]);
@@ -215,7 +219,7 @@ function loop(){
       scanned=true;
     }
   }
-  model.detect(view,8,0.55).then(function(dets){
+  model.detect(view,10,0.45).then(function(dets){
     if(scanned&&lastQR)lastQR.t=Date.now(); // 推論耗時不可預期，時效以本 tick 完成時間為準
     lastDets=dets;frames++;
     evaluate(dets,Date.now());
@@ -225,7 +229,7 @@ function loop(){
   }).catch(function(){errors++;setTimeout(loop,400)});
 }
 function draw(dets){
-  ctx.lineWidth=3;ctx.font='15px system-ui';
+  ctx.lineWidth=4;ctx.font='20px system-ui';
   for(const d of dets){
     if(!(d.class in ZH))continue;
     const x=d.bbox[0],y=d.bbox[1],w=d.bbox[2],h=d.bbox[3];
@@ -234,8 +238,8 @@ function draw(dets){
     ctx.strokeStyle=isScr&&targetMode?'#7fd7ff':(p0?'#ff8f7a':'#8fe3cf');
     ctx.strokeRect(x,y,w,h);
     const label=ZH[d.class]+(isScr?'（映射:機台候選）':'')+' '+Math.round(d.score*100)+'%';
-    ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(x,Math.max(0,y-20),ctx.measureText(label).width+10,20);
-    ctx.fillStyle='#fff';ctx.fillText(label,x+5,Math.max(14,y-5));
+    ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(x,Math.max(0,y-26),ctx.measureText(label).width+12,26);
+    ctx.fillStyle='#fff';ctx.fillText(label,x+6,Math.max(18,y-7));
   }
   if(lastQR&&Date.now()-lastQR.t<1600){
     const b=lastQR.box;ctx.strokeStyle='#ffd166';ctx.strokeRect(b[0],b[1],b[2],b[3]);
@@ -279,7 +283,13 @@ $('start').onclick=start;
 $('target').onclick=function(){setTarget(!targetMode)};
 $('ask').onclick=describe;
 $('mic').onclick=listen;
-$('blackout').onchange=function(e){document.body.classList.toggle('blackout',e.target.checked)};
+function setBlackout(on){
+  document.body.classList.toggle('blackout',on);
+  $('blackout').checked=on;
+  speak(on?'黑屏模式開啟。要退出，請按畫面最下方的按鈕。':'黑屏模式關閉。',true);
+}
+$('blackout').onchange=function(e){setBlackout(e.target.checked)};
+$('exitBlack').onclick=function(){setBlackout(false)};
 window.addEventListener('error',function(){errors++});
 if(AUTOSTART)start();
 }
