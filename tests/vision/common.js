@@ -2,7 +2,7 @@
 const path = require('path');
 const { chromium } = require('playwright');
 
-const BASE = 'http://127.0.0.1:4303/vision/';
+const BASE = 'http://127.0.0.1:' + (process.env.VISION_PORT || 4303) + '/vision/';
 
 async function launch(extraArgs) {
   const args = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'].concat(extraArgs || []);

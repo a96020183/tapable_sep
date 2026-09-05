@@ -1,0 +1,32 @@
+[
+  {
+    "id": "S5-0",
+    "desc": "假模型啟動 ready",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "S5-1",
+    "desc": "score 0.5（<0.66）連兩幀 hits>=2 仍不報",
+    "pass": true,
+    "detail": "live=S5-A hits=2"
+  },
+  {
+    "id": "S5-2",
+    "desc": "score 0.9 但單幀（hits=1）→ 不報",
+    "pass": true,
+    "detail": "live=S5-B hits=1"
+  },
+  {
+    "id": "S5-3",
+    "desc": "高分+hits>=2+tier0 → gating 通過並播報汽車",
+    "pass": true,
+    "detail": "注意，正前方有汽車，很近。"
+  },
+  {
+    "id": "S5-9",
+    "desc": "無未捕捉 JS 錯誤",
+    "pass": true,
+    "detail": "無"
+  }
+]

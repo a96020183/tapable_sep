@@ -1,0 +1,38 @@
+[
+  {
+    "id": "S4-0",
+    "desc": "假模型啟動 ready",
+    "pass": true,
+    "detail": ""
+  },
+  {
+    "id": "S4-1",
+    "desc": "tier1（近但非很近）椅子連注 4 幀 → 不報",
+    "pass": true,
+    "detail": "S4-B"
+  },
+  {
+    "id": "S4-2",
+    "desc": "進 tier0 + 正前方 → 報「前方有障礙物，椅子」",
+    "pass": true,
+    "detail": "注意，前方有障礙物，椅子。"
+  },
+  {
+    "id": "S4-3",
+    "desc": "持續 tier0 正前方（不動）→ 不重報（不誤觸發）",
+    "pass": true,
+    "detail": "S4-D"
+  },
+  {
+    "id": "S4-4",
+    "desc": "tier0 但非正前方（左前方）→ 方向 gating → 不報",
+    "pass": true,
+    "detail": "S4-C"
+  },
+  {
+    "id": "S4-9",
+    "desc": "無未捕捉 JS 錯誤",
+    "pass": true,
+    "detail": "無"
+  }
+]

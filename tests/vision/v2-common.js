@@ -1,7 +1,7 @@
 'use strict';
 // v2 共用：事件引擎改版驗證。伺服器在 4188（tvd 目錄）。
 const c = require('./common');
-const BASE = 'http://127.0.0.1:4188/vision/';
+const BASE = 'http://127.0.0.1:' + (process.env.VISION_PORT || 4303) + '/vision/';
 
 // 畫布 640x480：area = w*h/307200；cx=(x+w/2)/640
 // tier0「很近」a>=.30；tier1「近」a>=.11；tier2「中距離」a>=.035；tier3「遠」
