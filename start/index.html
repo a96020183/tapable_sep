@@ -18,12 +18,32 @@ a.card.primary{border-color:var(--accent)}
 .d{color:var(--muted);font-size:.95rem;margin-top:4px}
 .tag{display:inline-block;font-size:.75rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-left:6px;color:var(--muted);vertical-align:middle}
 .flow{background:#0b1220;border-left:3px solid var(--accent);padding:10px 14px;border-radius:8px;color:var(--muted);font-size:.95rem;margin:18px 0}
+.audio{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.audio button{font:inherit;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:8px 16px;min-height:44px;cursor:pointer}
+.audio button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.audio summary{color:var(--muted);font-size:.9rem;cursor:pointer;margin-top:8px}
+.audio details p{color:var(--muted);font-size:.9rem;margin:8px 0}
+#intro-state{color:var(--muted);font-size:.85rem;margin-left:10px}
 footer{margin-top:24px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:10px}
 </style>
 </head>
 <body>
 <h1>TapAble — 你的手機，接管機台</h1>
 <p class="sub">視障者用自己的手機操作沒有無障礙功能的觸控機台，機台零硬體改造。兩個 demo 是同一段旅程的兩個接力。</p>
+
+<div class="audio">
+  <button id="intro-play" type="button" aria-describedby="intro-note">▶︎ 播放 60 秒語音導覽</button>
+  <span id="intro-state" role="status"></span>
+  <p id="intro-note" class="d">由 ElevenLabs 語音合成。逐字稿在下方，聽不到聲音也拿得到同樣資訊。</p>
+  <details>
+    <summary>語音導覽逐字稿</summary>
+    <p>TapAble，你的手機，接管機台。</p>
+    <p>台灣的公共服務全面觸控化。對視障者來說，每一台機器都是一面摸不到按鍵的玻璃 —— 摸不到按鍵，也不知道螢幕上有什麼。</p>
+    <p>TapAble 不改機台一根螺絲。手機鏡頭帶你走完最後十公尺；碰一下機台旁的感應貼紙，手機就知道面前是哪一台機器；接著用語音對話，一步一步陪你把事情辦完。全程螢幕全黑，旁人偷看不到。</p>
+    <p>這個頁面上有三個連結：機台操作 demo、鏡頭導引 demo，以及完整的技術文件。建議先開機台操作 demo，它在電腦上就能走完整個流程。</p>
+    <p>這段導覽由 ElevenLabs 語音合成。產品本身的語音則使用裝置端合成，確保沒有網路時也能用。</p>
+  </details>
+</div>
 
 <a class="card primary" href="../?machine=campus-document-kiosk&amp;demo=1">
   <div class="t">📳 機台操作 demo <span class="tag">主要作品</span><span class="tag">不需硬體</span></div>
@@ -53,5 +73,20 @@ footer{margin-top:24px;color:var(--muted);font-size:.8rem;border-top:1px solid v
 </a>
 
 <footer>影像僅於裝置端即時處理，不儲存、不上傳。機台畫面為模擬；真機履約需機構合作，屬下一階段。</footer>
+<script>
+(function(){
+  var btn=document.getElementById('intro-play'), state=document.getElementById('intro-state'), audio=null;
+  function label(playing){ btn.textContent=playing?'⏸ 暫停語音導覽':'▶︎ 播放 60 秒語音導覽'; }
+  btn.addEventListener('click',function(){
+    if(!audio){
+      audio=new Audio('audio/intro.mp3');
+      audio.addEventListener('ended',function(){ label(false); state.textContent='導覽播放完畢。'; });
+      audio.addEventListener('error',function(){ label(false); state.textContent='音檔無法播放，請看下方逐字稿。'; });
+    }
+    if(audio.paused){ audio.play().then(function(){ label(true); state.textContent=''; }).catch(function(){ state.textContent='瀏覽器擋下自動播放，請再按一次。'; }); }
+    else { audio.pause(); label(false); state.textContent='已暫停。'; }
+  });
+})();
+</script>
 </body>
 </html>
