@@ -13,3 +13,12 @@ node tests/vision/v2-feedback_bugs.js    # 多實例去重
 ```
 
 每支腳本逐行輸出 `PASS | 編號 | 說明`。抵達交棒流程另需以假相機餵 QR 影像，見腳本註解。
+
+## 機台操作段（index.html）回歸
+
+```bash
+python -m http.server 4302        # repo 根目錄
+OP_PORT=4302 node tests/op/run-all.js     # op-p0（P0 修補）、op-p1-voice（語音四步驟＋LLM 退回）、op-p2（中斷／stage）＝37 項
+OP_PORT=4302 node tests/op/op-r2-ux.js    # 第二輪 UX 契約 29 項（字幕列、雙重回饋、外框、開發者面板、開場、完成頁、按鈕列）
+```
+vision 測試預設打 http://127.0.0.1:4303/vision/（見各檔頂部），請在 repo 根目錄以 4303 起服務。
