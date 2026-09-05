@@ -1,5 +1,16 @@
 # 測試
 
+## 無障礙自動檢測（axe-core，WCAG 2.1 A/AA）
+
+```bash
+python -m http.server 4302        # repo 根目錄
+OP_PORT=4302 node tests/a11y/axe-audit.js   # 入口頁＋操作段 15 步驟＋隱私模式黑屏＋鏡頭段，共 18 個畫面
+```
+
+需要網路（axe-core 由 cdnjs 載入）。目前結果：**18 個畫面、違規 0 項**。
+自動檢測只能涵蓋部分規則，不能取代真人測試 —— 另有戴眼罩實測與視障者訪談。
+
+
 vision 事件引擎回歸（Playwright，headless；以 `window.__V.evaluate()` 注入合成偵測，不需真相機）：
 
 ```bash
