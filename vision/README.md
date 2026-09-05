@@ -32,3 +32,5 @@
 | jsQR | 1.4.0 | Apache-2.0 |
 | qrcode-generator | 1.4.4 | MIT |
 | MobileNet v1 0.25（機台外觀比對用嵌入模型） | tfjs-models | Apache-2.0 |
+
+> 註：QR 標記內容 `TAPTHROUGH-KIOSK-01` 與 Service Worker 快取名前綴 `tapthrough-` 為專案早期代號，刻意保留以相容已印出的標記與既有快取；使用者可見文字皆為 TapAble。

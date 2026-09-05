@@ -235,7 +235,7 @@ function guideTarget(dets,now){
       arrived=true;cueOk();
       const ar=$('arrive');ar.style.display='block';
       ar.innerHTML='✓ 已抵達目標機台<br><button id="handoff" type="button">📳 碰觸貼紙 → 交棒操作段（demo 以按鈕模擬）</button>';
-      $('handoff').onclick=function(){location.href='../?machine=campus-document-kiosk&demo=1'};
+      $('handoff').onclick=function(){stop();location.href='../?machine=campus-document-kiosk&demo=1'}; // 交棒前先關相機與 Wake Lock
       speak('已抵達目標機台。請將手機靠近感應區。',true);
       setIntent('{"event":"arrived","target":"kiosk"}');return;
     }
