@@ -27,6 +27,9 @@ async function newPage(browser, opts = {}) {
   });
   // 預設以 stub 取代 speechSynthesis：headless Edge 實際合成語音會讓 renderer 崩潰，且 speakLog 由頁面自行 push、不受影響。
   if (!opts.realSpeech) await page.addInitScript(SPEECH_STUB);
+  // 預設關閉雲端 LLM 解析：既有回歸只驗裝置端規則式路徑，不打外網、可離線重現。
+  // 雲端路徑另由 tests/op/op-llm.js 以攔截路由測試（opts.cloud = true）。
+  if (!opts.cloud) await page.addInitScript(`try{localStorage.setItem('tapable.llm.cloud','0')}catch(e){}`);
   if (opts.init) await page.addInitScript(opts.init);
   return { context, page, errors };
 }

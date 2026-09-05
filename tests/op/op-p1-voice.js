@@ -12,9 +12,11 @@ async function detectKeyName(page) {
   const names = new Set(); let m;
   while ((m = re.exec(html))) names.add(m[1]);
   const list = [...names];
-  // 若為前綴串接（如 'x.llm.'+k），補上 'key'
-  const cand = list.find(n => /key|token|llm|openai|api/i.test(n));
-  const key = cand ? (/[._-]$/.test(cand) ? cand + 'key' : cand) : null;
+  // 先找真正以 key 結尾的鍵名；其次才是前綴串接（如 'x.llm.'+k），補上 'key'。
+  // 注意：原始碼裡還有 tapable.llm.cloud 等同前綴的鍵，不可只憑關鍵字取第一個。
+  const exact = list.find(n => /key$/i.test(n));
+  const prefix = list.find(n => /[._-]$/.test(n) && /llm|key|token|openai|api/i.test(n));
+  const key = exact || (prefix ? prefix + 'key' : null);
   return { all: list, key };
 }
 

@@ -73,7 +73,9 @@ html.framed{--frame-h:min(900px,calc(100dvh - 24px));background:#02050a}
   <label class="check"><input id="contrast" type="checkbox">高對比</label>
   <label class="check"><input id="large" type="checkbox">較大文字</label>
   <details id="llm-settings"><summary>進階（選用）：LLM 意圖解析</summary>
-  <p class="muted">語音辨識出的文字可先交給你自己的 LLM 端點解析意圖；未設定、逾時或回傳格式不符時自動改用關鍵字比對。以下設定只存在這台手機的瀏覽器，不會上傳到本專案任何伺服器。</p>
+  <p class="muted">預設會把辨識出的文字送到本專案自架的解析代理（原始碼在 repo 的 server/vercel），由它呼叫大型語言模型判斷你這一步想選什麼。只有選文件、份數、學年期與確認這四個步驟會送出；輸入身分資料的步驟一律不送。離線、逾時或回傳格式不符時自動改用裝置端的規則式比對。</p>
+  <label class="check"><input id="llm-cloud" type="checkbox" checked>使用內建雲端意圖解析</label>
+  <p class="muted">關閉後全部改用裝置端規則式解析，語音不會離開這支手機。也可以改填自己的端點與 key，設定只存在這台手機的瀏覽器。</p>
   <label for="llm-endpoint">端點</label><input id="llm-endpoint" type="url" autocomplete="off" placeholder="https://api.openai.com/v1/chat/completions">
   <label for="llm-model">模型</label><input id="llm-model" type="text" autocomplete="off" placeholder="gpt-4o-mini">
   <label for="llm-key">API key</label><input id="llm-key" type="password" autocomplete="off">
@@ -244,6 +246,12 @@ globalThis.TT = globalThis.TT || {};
   let session=machine?new TT.Session(machine,demo):null;
   let privateMode=false,version='B',recognition=null,voiceCandidate=null,voiceToken=0,asyncToken=0;
   let liveTimer,currentCopy='',helpOpen=false,ttsManuallyOff=false;
+  // P2-2 手動關閉語音的選擇跨重整保留（鍵 tapable.tts.off）；使用者再勾回時清除
+  try { ttsManuallyOff=localStorage.getItem('tapable.tts.off')==='1'; } catch {}
+  // P1 黏底 #action-bar 讓主按鈕跨步驟座標相同：指標點擊換頁後 350ms 內忽略 #action-bar 的指標點擊（鍵盤／讀屏不受影響）
+  const ACTION_COOLDOWN_MS=350;
+  let lastPointerActionAt=-Infinity,actionCooldownUntil=0;
+  const isPointerClick=e=>e.pointerType?true:(e.pointerType===undefined&&e.detail>0);
   let swipeEnabled=demo;
   const announce=(text,error=false)=>{
     const target=$(error?'error-announcer':'announcer');
@@ -323,7 +331,8 @@ globalThis.TT = globalThis.TT || {};
   const hasRecognition=()=>!!(window.SpeechRecognition||window.webkitSpeechRecognition);
   function voiceSection(state) {
     const v=VOICE_STATES[state]; if(!v) return '';
-    return `<section aria-label="語音輸入" class="card"><button type="button" class="secondary" id="voice-start">${v.label}</button><p id="voice-status">${hasRecognition()?v.prompt:'此瀏覽器目前無法使用網頁語音辨識。你仍然可以使用手機的系統語音輸入，或使用畫面選項完成操作。'}</p><div id="voice-result"></div></section>`;
+    // P2-5 無 SpeechRecognition API：按鈕停用，#voice-status 顯示 fallback 文案
+    return `<section aria-label="語音輸入" class="card"><button type="button" class="secondary" id="voice-start"${hasRecognition()?'':' disabled'}>${v.label}</button><p id="voice-status">${hasRecognition()?v.prompt:'此瀏覽器目前無法使用網頁語音辨識。你仍然可以使用手機的系統語音輸入，或使用畫面選項完成操作。'}</p><div id="voice-result"></div></section>`;
   }
   function summary() {
     return `<div class="card"><dl><div><dt>申請文件</dt><dd>${escape(session.service.name)}</dd></div>${session.order.rank?`<div><dt>名次類型</dt><dd>${escape(session.order.rank)}</dd></div>`:''}${session.order.semester?`<div><dt>學年期</dt><dd>${escape(session.order.semester)}</dd></div>`:''}<div><dt>份數</dt><dd>${session.order.copies}</dd></div><div><dt>單價</dt><dd>NT$${session.service.price}</dd></div><div class="total"><dt>總金額</dt><dd>NT$${session.total}</dd></div></dl></div>`;
@@ -353,7 +362,14 @@ globalThis.TT = globalThis.TT || {};
       return heading(title,`<p class="error-text">${text}</p>${kind==='timeout'?'<p>繼續等待只會重新啟動手機提醒，不代表機台交易仍有效。</p>':''}${actions(button(resume,'RESUME')+button('請求協助','HELP','','secondary')+button('重新開始','ASK_RESET','','secondary'),false)}`);
     }
   };
-  function cancelRecognition() { ++voiceToken; if(recognition) { recognition.abort(); recognition=null; } voiceCandidate=null; }
+  function cancelRecognition() {
+    ++voiceToken; if(recognition) { recognition.abort(); recognition=null; } voiceCandidate=null;
+    // P2-1 聆聽中被中止（切背景、開設定、切隱私）：同步把聆聽 UI 改為已停止，避免卡在「正在聆聽」
+    if($('voice-cancel')) {
+      const text='已停止聆聽，請重新按用語音選擇。';
+      $('voice-result').innerHTML=''; if($('voice-status')) $('voice-status').textContent=text; $('caption-heard').textContent=text;
+    }
+  }
   function dispatch(event,value) {
     if(event==='HELP') { showHelp(); return; }
     if(event==='ASK_RESET') { $('reset-dialog').showModal(); return; }
@@ -431,6 +447,8 @@ globalThis.TT = globalThis.TT || {};
   }
   function render(focus=true) {
     helpOpen=false;
+    // P1 由指標點擊 #action-bar 觸發的換頁：新頁的 #action-bar 冷卻 350ms（程式化 dispatch／鍵盤／語音套用不設冷卻）
+    if(performance.now()-lastPointerActionAt<ACTION_COOLDOWN_MS) actionCooldownUntil=performance.now()+ACTION_COOLDOWN_MS;
     if(!session) {
       $('main').innerHTML=heading(machineId?'無法識別這台機器':'等待連接機台',`<p>${machineId?'這個機台代號尚未提供引導。請確認開啟的連結。':'開啟機台連結後，即可開始操作。你也可以先體驗 Demo。'}</p><div class="actions"><a class="card" href="?machine=campus-document-kiosk&amp;demo=1">進入 Demo</a></div>`);
       currentCopy=machineId?'無法識別這台機器，請確認連結。':'等待連接機台。';
@@ -470,8 +488,13 @@ globalThis.TT = globalThis.TT || {};
   $('main').addEventListener('click',e=>{
     const b=e.target.closest('button');
     if(!b) return;
+    if(isPointerClick(e) && b.closest('#action-bar')) {
+      // P1 雙擊連跳防護：冷卻中的指標點擊直接忽略（preventDefault 同時擋掉 submit 按鈕的表單送出）
+      if(performance.now()<actionCooldownUntil) { e.preventDefault(); return; }
+      lastPointerActionAt=performance.now();
+    }
     if(b.dataset.event) { if(b.dataset.event==='START') autoEnableSpeech(); handleEvent(b.dataset.event,b.dataset.value); }
-    else if(['auth-private','review-private'].includes(b.id)) { setPrivate(!privateMode); b.textContent=privateMode?'關閉隱私模式':'啟用隱私模式'; }
+    else if(['auth-private','review-private'].includes(b.id)) setPrivate(!privateMode); // 按鈕文字由 setPrivate 統一更新（P2-3）
     else if(b.id==='help') showHelp();
     else if(b.id==='voice-start') startRecognition();
     else if(b.id==='voice-confirm' && voiceCandidate && voiceCandidate.state===session.state) { const c=voiceCandidate; voiceCandidate=null; applyIntent(c.intent,c.state); }
@@ -500,44 +523,156 @@ globalThis.TT = globalThis.TT || {};
     $('caption-heard').textContent=text;
     $('voice-start')?.focus(); announce(text,true);
   }
-  // ===== 語音意圖解析（純關鍵字，全瀏覽器端） =====
-  const NUM={'一':1,'1':1,'１':1,'二':2,'兩':2,'2':2,'２':2,'三':3,'3':3,'３':3,'四':4,'4':4,'４':4,'五':5,'5':5,'５':5};
-  const NUM_RE='[一二兩三四五1-5１-５]';
-  // 順序重要：較長／較特定的關鍵字先比對
-  const SERVICE_KEYWORDS=[
-    ['enrollment-en',/英文.{0,3}在學|在學.{0,3}英文/],
-    ['english',/英文.{0,3}成績|成績.{0,3}英文/],
-    ['rank',/名次/],
-    ['semester-transcript',/學期成績/],
-    ['history',/歷年|成績表/],
-    ['enrollment',/在學/]
-  ];
+  // ===== 語音意圖解析（規則式，全程在瀏覽器內；不送出任何資料） =====
   const enabledServices=()=>machine.availableServices.filter(s=>s.enabled);
-  const normalizeSemester=text=>text.replace(/一百一十/g,'一一').replace(/一一五/g,'115').replace(/一一四/g,'114').replace(/一一三/g,'113').replace(/第一/g,'第1').replace(/第二/g,'第2').replace(/上學期/g,'第1學期').replace(/下學期/g,'第2學期');
-  function parseIntent(transcript,state) {
-    const text=String(transcript??'').replace(/\s/g,'');
-    if(!text||!machine) return null;
-    if(state==='SERVICE') {
-      const hit=SERVICE_KEYWORDS.find(([id,re])=>re.test(text)&&enabledServices().some(s=>s.id===id));
-      if(!hit) return null;
-      const out={service:hit[0]};
-      const m=text.match(new RegExp(`(${NUM_RE})(?:份|張)`)); if(m) out.copies=NUM[m[1]];
-      return out;
+  function parseIntent2(transcript, state, machine, context) {
+    // ---------- 對照表 ----------
+    // 常見簡體／異體字 → 正體（語音辨識偶爾吐出簡體）
+    const S2T = { '学': '學', '証': '證', '证': '證', '绩': '績', '单': '單', '历': '歷', '毕': '畢', '业': '業', '级': '級', '补': '補', '发': '發', '书': '書', '预': '預', '计': '計', '录': '錄', '请': '請', '两': '兩', '个': '個', '张': '張', '认': '認', '确': '確', '没': '沒', '问': '問', '题': '題', '选': '選', '较': '較' };
+    const CN_NUM = { '零': '0', '〇': '0', '一': '1', '二': '2', '兩': '2', '三': '3', '四': '4', '五': '5', '六': '6', '七': '7', '八': '8', '九': '9' };
+    // 服務同義詞：同一句話同時命中多個 key 時，以「最長的 key」為準（越長越具體）
+    const SERVICE_SYNONYMS = [
+      { id: 'enrollment-en', label: '英文在學證明書', keys: ['英文在學證明書', '英文在學證明', '英文版在學證明', '英文在學', '在學證明英文', '在學英文', '英語在學'] },
+      { id: 'enrollment', label: '中文在學證明書', keys: ['中文在學證明書', '中文在學證明', '在學證明書', '在學證明', '在校證明', '就學證明', '在學'] },
+      { id: 'english', label: '英文成績單', keys: ['英文成績單', '英文版成績單', '英文成績', '成績單英文', '成績英文', '英語成績'] },
+      { id: 'rank', label: '中文成績名次證明書', keys: ['成績名次證明書', '成績名次證明', '名次證明書', '名次證明', '成績名次', '排名證明', '名次', '排名'] },
+      { id: 'semester-transcript', label: '中文學期成績單', keys: ['學期成績單', '學期成績', '這學期成績', '本學期成績', '單學期成績'] },
+      { id: 'history', label: '中文歷年成績表', keys: ['歷年成績表', '歷年成績單', '歷年成績', '歷年', '成績表', '成績單', '成績'] },
+      // 以下為此原型未提供的服務：命中時回 unavailable，讓 UI 能說明而不是沉默
+      { id: 'student-card', label: '學生證補發', keys: ['學生證補發', '補發學生證', '補辦學生證', '學生證'] },
+      { id: 'diploma', label: '畢業證書／畢業證明', keys: ['畢業證明書', '畢業證書', '畢業證明', '學位證書', '畢業證'] },
+      { id: 'envelope', label: '成績單信封彌封', keys: ['成績單信封彌封', '成績單信封', '信封彌封', '信封', '彌封'] },
+      { id: 'weighted', label: '規整加權成績名次證明書', keys: ['規整加權成績名次', '規整加權', '加權成績', '加權名次', '加權'] },
+      { id: 'expected', label: '預期畢業（在學）證明', keys: ['預期畢業在學證明', '預期畢業證明', '預期畢業', '預計畢業'] }
+    ];
+    const EN_FLAG = /英文|英語|english/;
+
+    // ---------- 正規化 ----------
+    const toHalfWidth = s => s.replace(/[！-～]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).replace(/　/g, ' ');
+    const toTraditional = s => s.replace(/[一-鿿]/g, ch => S2T[ch] || ch);
+    const toArabic = s => s.replace(/一百一十/g, '一一').replace(/[零〇一二兩三四五六七八九]/g, ch => CN_NUM[ch]);
+    // 「114-2」「114/2」「114．2」→「114學年度第2學期」（要在去標點前處理）
+    const fixSemesterDash = s => s.replace(/(1[01]\d)\s*[-–—/\\.、]\s*([12])(?!\d)/g, '$1學年度第$2學期');
+    const strip = s => s.replace(/[\s\p{P}\p{S}]/gu, '');
+
+    const base = toTraditional(toHalfWidth(String(transcript ?? ''))).toLowerCase();
+    const t = strip(fixSemesterDash(base));            // 未轉數字（REVIEW／服務關鍵字用）
+    const n = strip(fixSemesterDash(toArabic(base)));  // 已轉數字（份數／學年期用）
+    if (!t) return null;
+
+    const done = obj => Object.assign(obj, { parser: 'rules' });
+
+    // ---------- 編輯距離（允許 1 個錯字或漏字） ----------
+    function lev(a, b) {
+      if (Math.abs(a.length - b.length) > 1) return 2;
+      let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+      for (let i = 1; i <= a.length; i++) {
+        const cur = [i];
+        for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        prev = cur;
+      }
+      return prev[b.length];
     }
-    if(state==='COPIES') { const m=text.match(new RegExp(NUM_RE)); return m?{copies:NUM[m[0]]}:null; }
-    if(state==='REVIEW') {
-      if(/取消|返回|不要|不對|不用|不好|不是|等一下|回上一步|修改/.test(text)) return {action:'BACK'};
-      // 單字「好／對／是」只在整句就是這個字時才算確認，避免任意句子誤判
-      if(/確認|確定|沒問題|可以|^(好|對|是)(的|啊|呀)?$|^ok$/i.test(text)) return {action:'CONFIRM'};
+    // 精確子字串優先；key 長度 ≥ 4 才允許模糊，避免「成績」「在學」等短詞被亂配
+    function findKey(text, key) {
+      if (text.includes(key)) return { fuzzy: false };
+      if (key.length < 4) return null;
+      for (const L of [key.length, key.length - 1, key.length + 1]) {
+        for (let i = 0; i + L <= text.length; i++) if (lev(text.slice(i, i + L), key) <= 1) return { fuzzy: true };
+      }
       return null;
     }
-    if(state==='SEMESTER') {
-      const n=normalizeSemester(text);
-      const s=machine.semesters.find(s=>n.includes(s.slice(0,3))&&n.includes(s.includes('第 2')?'第2':'第1'));
-      return s?{semester:s}:null;
+
+    // ---------- 份數 ----------
+    const COPY_UNIT = '(?:份|張|本|分|次)';
+    const defaultMax = () => {
+      const list = (machine?.availableServices || []).filter(s => s.enabled).map(s => Number(s.maxCopies)).filter(Number.isInteger);
+      return list.length ? Math.max(...list) : 5;
+    };
+
+    // ==================== SERVICE ====================
+    if (state === 'SERVICE') {
+      const services = machine?.availableServices;
+      if (!Array.isArray(services)) return null;
+      let hits = [];
+      for (const row of SERVICE_SYNONYMS) {
+        for (const key of row.keys) {
+          const hit = findKey(t, key);
+          // 模糊命中扣 1.5：讓「精確命中的 N 字 key」永遠贏過「只差一字的 N+1 字 key」
+          if (hit) hits.push({ id: row.id, label: row.label, key, fuzzy: hit.fuzzy, score: key.length - (hit.fuzzy ? 1.5 : 0) });
+        }
+      }
+      // 「我還在學校」不是在學證明
+      hits = hits.filter(h => !(h.key === '在學' && /在學校/.test(t)));
+      if (!hits.length) return null;
+      hits.sort((a, b) => b.score - a.score);
+      const best = hits[0];
+      let id = best.id;
+      // 「英文」優先於中文：在學 → 英文在學；各種成績單 → 英文成績單
+      if (EN_FLAG.test(t) && !/中文/.test(t)) {
+        if (id === 'enrollment') id = 'enrollment-en';
+        else if (id === 'history' || id === 'semester-transcript') id = 'english';
+      }
+      const svc = services.find(s => s.id === id);
+      let confidence = best.fuzzy ? 0.7 : best.key.length >= 4 ? 0.9 : best.key.length === 3 ? 0.75 : 0.6;
+      if (!svc || !svc.enabled) {
+        return done({ service: null, unavailable: svc?.name || best.label, unavailableId: id, matched: best.key, confidence: Math.min(confidence, 0.8) });
+      }
+      const out = { service: id, matched: best.key, confidence };
+      const m = n.match(new RegExp('(\\d+)' + COPY_UNIT));
+      if (m) {
+        const c = Number(m[1]);
+        const max = Number.isInteger(svc.maxCopies) ? svc.maxCopies : defaultMax();
+        if (c >= 1 && c <= max) out.copies = c; else out.confidence = Math.min(out.confidence, 0.5);
+      }
+      return done(out);
     }
+
+    // ==================== COPIES ====================
+    if (state === 'COPIES') {
+      const max = Number.isInteger(context?.maxCopies) ? context.maxCopies : defaultMax();
+      if (/[十]/.test(n)) return null; // 「十份」必定超過上限
+      const m = n.match(new RegExp('(\\d+)' + COPY_UNIT)) || n.match(/(\d+)/);
+      if (!m) return null;
+      const c = Number(m[1]);
+      if (!Number.isInteger(c) || c < 1 || c > max) return null;
+      return done({ copies: c, confidence: /份|張|本/.test(n) ? 0.9 : 0.75 });
+    }
+
+    // ==================== REVIEW ====================
+    if (state === 'REVIEW') {
+      // 先否定／返回（「不確定」「不好」含有確認字眼，必須先攔）
+      if (/不對|不要|不用|不好|不是|不行|不確定|不可以|取消|返回|等(一|1)下|錯了|回上一步|上一步|修改|重來|重選|重新|回去|再想/.test(t)) return done({ action: 'BACK', confidence: 0.9 });
+      // 問句（「可以嗎」「請問…」）不是確認
+      if (/嗎$|呢$|^請問/.test(t)) return null;
+      if (/確認|確定|沒問題|沒錯|可以|正確|送出|就這樣|^(好|對|是|行|嗯|要)(的|啊|呀|喔|哦|了)?$|^ok$|^okay$|^yes$/.test(t)) return done({ action: 'CONFIRM', confidence: 0.85 });
+      return null;
+    }
+
+    // ==================== SEMESTER ====================
+    if (state === 'SEMESTER') {
+      const semesters = Array.isArray(machine?.semesters) ? machine.semesters : [];
+      const ym = n.match(/1[01]\d/);
+      if (!ym) return null;
+      const year = ym[0];
+      const rest = n.slice(n.indexOf(year) + year.length);
+      let term = null;
+      let m;
+      if ((m = rest.match(/^(?:學年度|學年|年度|年)?第?([12])/))) term = m[1];
+      else if ((m = n.match(/第([12])(?:學期|期)?/))) term = m[1];
+      else if ((m = n.match(/([12])學期/))) term = m[1];
+      // 先在年度之後找「上／下」：「上個學期啦，114 學年度那個下學期」的意思是下學期
+      else if ((m = rest.match(/(上|下)(?:個)?(?:學期|學|半)/))) term = m[1] === '上' ? '1' : '2';
+      else if ((m = n.match(/(上|下)(?:學期|學|半)?/))) term = m[1] === '上' ? '1' : '2';
+      if (!term) return null;
+      const found = semesters.find(s => { const c = s.replace(/\s/g, ''); return c.startsWith(year) && c.includes('第' + term + '學期'); });
+      return found ? done({ semester: found, confidence: 0.9 }) : null;
+    }
+
     return null;
   }
+  // 薄包裝：沿用舊簽名，讓測試掛鉤與呼叫端不必改動
+  const parseIntent=(transcript,state)=>parseIntent2(transcript,state,machine,{maxCopies:session?.service?.maxCopies});
   // 驗證 LLM 或關鍵字結果，只保留此步驟合法的欄位
   function sanitizeIntent(raw,state) {
     if(!raw||typeof raw!=='object') return null;
@@ -549,7 +684,21 @@ globalThis.TT = globalThis.TT || {};
     const ok={SERVICE:!!out.service,COPIES:!!out.copies,REVIEW:!!out.action,SEMESTER:!!out.semester}[state];
     return ok?out:null;
   }
-  // ===== 選用：LLM 意圖層（設定只存 localStorage；key 不進原始碼、不進 console） =====
+  // ===== 預設 LLM 意圖層：呼叫本專案自架的代理（評審不需任何 key；伺服器程式碼見 server/vercel） =====
+  // key 只存在代理的環境變數，不在前端；離線、逾時或格式不符時自動退回上面的規則式解析。
+  const LLM_PROXY='https://tapable-intent.vercel.app/api/intent';
+  const cloudLLMEnabled=()=>{ try { return localStorage.getItem('tapable.llm.cloud')!=='0'; } catch { return true; } };
+  async function parseIntentProxy(transcript,state,ctx) {
+    if(!LLM_PROXY||!VOICE_STATES[state]) return null;
+    const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),5000);
+    try {
+      const res=await fetch(LLM_PROXY,{method:'POST',signal:controller.signal,headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({transcript:String(transcript),state,services:ctx.services,maxCopies:ctx.maxCopies,semesters:ctx.semesters})});
+      if(!res.ok) return null;
+      return sanitizeIntent(await res.json(),state);
+    } catch { return null; } finally { clearTimeout(timer); }
+  }
+  // ===== 選用：改用自己的 LLM 端點（設定只存 localStorage；key 不進原始碼、不進 console） =====
   const LLM_DEFAULTS={endpoint:'https://api.openai.com/v1/chat/completions',model:'gpt-4o-mini'};
   const llm={endpoint:'',model:'',key:''};
   try { Object.keys(llm).forEach(k=>{ llm[k]=localStorage.getItem('tapable.llm.'+k)||''; }); } catch {}
@@ -607,26 +756,40 @@ globalThis.TT = globalThis.TT || {};
     rec.onresult=async e=>{
       if(token!==voiceToken||session.state!==state) return;
       resolved=true;
-      const transcript=e.results[0][0].transcript;
+      // P2-4 results 可能為空（部分瀏覽器／被中止的結果）：視同沒有辨識到，不拋 TypeError
+      const transcript=String(e.results?.[0]?.[0]?.transcript ?? '');
+      if(!transcript.trim()) { recognitionFailure('no-speech'); return; }
+      // P2-6 超長逐字稿：解析只用前 200 字，畫面顯示截斷至 120 字加「…」
+      const parsable=transcript.slice(0,200);
+      const shown=transcript.length>120?transcript.slice(0,120)+'…':transcript;
       let intent=null, source='關鍵字比對';
-      if(llmConfig().key) {
+      const ownKey=!!llmConfig().key, useCloud=!ownKey&&cloudLLMEnabled();
+      if(ownKey||useCloud) {
         $('voice-status').textContent='正在以 LLM 解析……';
-        intent=await parseIntentLLM(transcript,state,voiceContext(state));
+        intent=ownKey?await parseIntentLLM(parsable,state,voiceContext(state)):await parseIntentProxy(parsable,state,voiceContext(state));
         if(token!==voiceToken||session.state!==state) return;
         if(intent) source='LLM 解析';
       }
-      if(!intent) intent=sanitizeIntent(parseIntent(transcript,state),state);
+      let unavailableMsg='';
+      if(!intent) {
+        const raw=parseIntent(parsable,state);
+        // 命中「本次原型未提供」的服務時要說明，而不是沉默；sanitizeIntent 會把它濾成 null
+        if(raw&&raw.unavailable) unavailableMsg=`此原型未提供「${raw.unavailable}」，請改選畫面上的其他文件。`;
+        intent=sanitizeIntent(raw,state);
+      }
+      // LLM 判出文件卻漏聽份數時（實測 gpt-4o-mini 偶爾如此），用規則式補上「兩份」這類數量
+      if(intent&&state==='SERVICE'&&!intent.copies) { const r=sanitizeIntent(parseIntent(parsable,state),state); if(r&&r.copies) intent.copies=r.copies; }
       if(intent?.copies&&intent.copies>(session.service?.maxCopies||5)&&state==='COPIES') intent=null;
       voiceCandidate=intent?{intent,state}:null;
       const heard=intent?describeIntent(intent,state):'';
-      $('voice-status').textContent=intent?`已辨識（${source}）。請確認後才會套用。`:`沒有找到對應選項（${source}）。請重新說一次，或使用畫面選項。`;
+      $('voice-status').textContent=intent?`已辨識（${source}）。請確認後才會套用。`:(unavailableMsg||`沒有找到對應選項（${source}）。請重新說一次，或使用畫面選項。`);
       $('voice-result').innerHTML=`<p id="heard"></p>${intent?'<button type="button" id="voice-confirm"></button>':''}<button type="button" id="voice-retry">重新說一次</button>`;
       // 辨識結果只用 textContent，不當 HTML 或指令處理
-      $('heard').textContent=intent?`我聽到：${transcript}（解析為：${heard}）`:`我聽到：${transcript}`;
+      $('heard').textContent=intent?`我聽到：${shown}（解析為：${heard}）`:`我聽到：${shown}`;
       $('caption-heard').textContent=$('heard').textContent; // 字幕列同步逐字稿（純文字）
       if(intent) $('voice-confirm').textContent=`確認：${heard}`;
       $(intent?'voice-confirm':'voice-retry').focus();
-      const readback=intent?`我聽到${heard}，請確認。`:'沒有找到對應選項，請重新說一次。';
+      const readback=intent?`我聽到${heard}，請確認。`:(unavailableMsg||'沒有找到對應選項，請重新說一次。');
       announce(readback); speech.speak(readback,sensitive());
     };
     rec.onerror=e=>{ if(token===voiceToken&&!resolved) recognitionFailure(e.error); };
@@ -637,6 +800,8 @@ globalThis.TT = globalThis.TT || {};
     privateMode=value; speech.stop(); cancelRecognition();
     document.documentElement.classList.toggle('private',value);
     $('private-banner').hidden=!value; $('private').checked=value;
+    // P2-3 頁內隱私模式切換鈕（AUTH／REVIEW）標籤統一在此同步，存在才更新
+    ['auth-private','review-private'].forEach(id=>{ const b=$(id); if(b) b.textContent=value?'關閉隱私模式':'啟用隱私模式'; });
     // opacity hides pixels only, keeping the entire operating surface in the accessibility tree.
     announce(value?'隱私模式已開啟。':'隱私模式已關閉。');
   }
@@ -656,13 +821,14 @@ globalThis.TT = globalThis.TT || {};
   $('settings-open').onclick=()=>{ speech.stop(); cancelRecognition(); $('settings').showModal(); $('settings-title').focus(); };
   $('settings-close').onclick=()=> $('settings').close();
   $('settings').addEventListener('close',()=>{ $('settings-open').focus(); });
-  $('tts').onchange=e=>{ speech.enabled=e.target.checked; ttsManuallyOff=!speech.enabled; if(speech.enabled) { speech.unlock(); speech.speak(currentCopy,sensitive()); } else speech.stop(); $('replay').disabled=!speech.enabled; $('speech-stop').disabled=!speech.enabled; };
+  $('tts').onchange=e=>{ speech.enabled=e.target.checked; ttsManuallyOff=!speech.enabled; try { if(ttsManuallyOff) localStorage.setItem('tapable.tts.off','1'); else localStorage.removeItem('tapable.tts.off'); } catch {} if(speech.enabled) { speech.unlock(); speech.speak(currentCopy,sensitive()); } else speech.stop(); $('replay').disabled=!speech.enabled; $('speech-stop').disabled=!speech.enabled; };
   // LLM 設定：只寫 localStorage（tapable.llm.*）
   const llmStatus=()=>{ $('llm-status').textContent=llm.key.trim()?'已設定 API key：語音辨識後會先嘗試 LLM 解析，失敗改用關鍵字比對。設定只存在這台裝置。':'未設定 API key：使用瀏覽器端關鍵字比對。'; };
   [['llm-endpoint','endpoint'],['llm-model','model'],['llm-key','key']].forEach(([id,k])=>{
     $(id).value=llm[k];
     $(id).oninput=()=>{ llm[k]=$(id).value; try { localStorage.setItem('tapable.llm.'+k,llm[k]); } catch {} llmStatus(); };
   });
+  { const c=$('llm-cloud'); if(c) { c.checked=cloudLLMEnabled(); c.onchange=()=>{ try { c.checked?localStorage.removeItem('tapable.llm.cloud'):localStorage.setItem('tapable.llm.cloud','0'); } catch {} announce(c.checked?'已開啟雲端意圖解析。':'已關閉雲端意圖解析，改用裝置端規則式。'); }; } }
   $('llm-clear').onclick=()=>{ Object.keys(llm).forEach(k=>{ llm[k]=''; try { localStorage.removeItem('tapable.llm.'+k); } catch {} }); ['llm-endpoint','llm-model','llm-key'].forEach(id=>{ $(id).value=''; }); llmStatus(); announce('已清除 LLM 設定。'); };
   llmStatus();
   $('rate').oninput=e=>{ speech.rate=Number(e.target.value); $('rate-value').textContent=e.target.value; };

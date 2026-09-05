@@ -1,0 +1,15 @@
+{
+  "name": "tapable-intent-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tapable demo 的語音意圖代理：把 OpenAI 相容 API key 留在伺服器端，瀏覽器只呼叫 /api/intent。",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node --check api/intent.js",
+    "test": "node test-local.js"
+  },
+  "license": "MIT"
+}

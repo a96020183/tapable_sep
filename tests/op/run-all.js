@@ -1,10 +1,10 @@
 'use strict';
-// 依序執行 op-p0 / op-p1-voice / op-p2，彙整 pass/fail 與失敗清單到 op-summary.json
+// 依序執行 op-p0 / op-p1-voice / op-p2 / op-hardening / op-llm，彙整 pass/fail 與失敗清單到 op-summary.json
 const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const scripts = ['op-p0.js', 'op-p1-voice.js', 'op-p2.js'];
+const scripts = ['op-p0.js', 'op-p1-voice.js', 'op-p2.js', 'op-hardening.js', 'op-llm.js'];
 const failures = []; let pass = 0, fail = 0;
 for (const s of scripts) {
   console.log(`=== ${s} ===`);
