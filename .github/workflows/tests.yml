@@ -1,0 +1,23 @@
+name: tests
+
+# 只跑零依賴的純 Node 套件：意圖解析單元測試（直接測 index.html 內出貨的解析器）
+# 與意圖代理單元測試（假 fetch，離線）。Playwright 系列需要瀏覽器與本機伺服器，
+# 執行方式見 tests/README.md，不在 CI 內跑。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  node-suites:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 語音意圖解析單元測試（85 項）
+        run: node tests/intent/parseIntent2.test.js
+      - name: 意圖代理單元測試（30 項）
+        run: node server/vercel/test-local.js
