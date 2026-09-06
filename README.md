@@ -1,5 +1,7 @@
 # TapAble — 你的手機，接管機台
 
+[![tests](https://github.com/a96020183/tapable_sep/actions/workflows/tests.yml/badge.svg)](https://github.com/a96020183/tapable_sep/actions/workflows/tests.yml)
+
 > **機台操作的手機接管中介層。** 視障者用自己的手機，操作面前那台沒有無障礙功能的觸控機台
 > —— 機台零硬體改造。
 >
