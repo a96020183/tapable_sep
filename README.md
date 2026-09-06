@@ -30,6 +30,10 @@
 
 ## 🎬 兩分鐘看懂
 
+**評選影片（1 分 47 秒）**：https://youtu.be/AtMjXhrwr38
+—— 戴眼罩實測、三個接力、語音聽懂口語的完整旅程。實測片段拍攝於真實機台前。
+
+
 - **Demo 入口頁（一個網址看全部）**：https://a96020183.github.io/tapable_sep/start/
 - **機台操作 demo**（手機或電腦開，模擬付款模式可走完全流程）：https://a96020183.github.io/tapable_sep/?machine=campus-document-kiosk&demo=1
 - **街道導引 demo**（手機開，允許相機）：https://a96020183.github.io/tapable_sep/vision/
