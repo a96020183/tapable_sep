@@ -23,6 +23,8 @@ async function cloudPage(browser, handler) {
   const ctx = await C.newPage(browser, { init: C.RECOGNITION_STUB, cloud: true });
   const reqs = [];
   await ctx.page.route(PROXY_GLOB, async route => {
+    // 頁面載入的健康檢查暖機是 GET，不算解析請求；契約只看 POST
+    if (route.request().method() !== 'POST') return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
     reqs.push({ url: route.request().url(), post: route.request().postData() || '' });
     return handler(route, reqs.length);
   });

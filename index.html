@@ -697,6 +697,9 @@ globalThis.TT = globalThis.TT || {};
   // key 只存在代理的環境變數，不在前端；離線、逾時或格式不符時自動退回上面的規則式解析。
   const LLM_PROXY='https://tapable-intent.vercel.app/api/intent';
   const cloudLLMEnabled=()=>{ try { return localStorage.getItem('tapable.llm.cloud')!=='0'; } catch { return true; } };
+  // 代理是無伺服器函式，閒置後第一次呼叫要冷啟動（實測可到 4 秒，會超過下面的 2.5 秒逾時）。
+  // 頁面載入就先無聲打一發健康檢查把它暖起來；失敗就算了，正式呼叫自然退回規則式。
+  try { if(cloudLLMEnabled()&&LLM_PROXY) fetch(LLM_PROXY+'?health=1').catch(()=>{}); } catch {}
   // 逾時 2.5 秒：實測熱路徑往返 0.8–1.5 秒；等更久對看不見畫面的人只是更長的沉默，
   // 不如早點退回裝置端規則式。proxyOutcome 讓 UI 能分辨「解析不出來」與「雲端沒回應」。
   const PROXY_TIMEOUT_MS=2500;
